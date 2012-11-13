@@ -1,0 +1,37 @@
+
+/* All segments active high */
+P2_0 - seg A 
+P2_1 - seg B
+P2_2 - seg C
+P2_3 - seg D
+P2_4 - seg E
+P2_5 - seg F
+P2_6 - seg G
+P2_7 - seg DP
+
+/* Active low */
+P3_0 - digit 0 
+P3_1 - digit 1
+
+/* Active low, internal pull-ups */
+P1_0 - encoder 0
+P1_1 - encoder 1
+P1_2 - encoder push
+
+MIDI:
+- output 
+
+LEDs:
+- LED: MIDI activity 
+- LED: 'channel'
+- LED: 'octave'
+- LED: 'velocity'
+
+USB:
+- DP
+- DN
+- USB_CONNECT
+- USB_VBUS
+
+----------------------------------------
+22 lines total
