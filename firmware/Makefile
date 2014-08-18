@@ -45,7 +45,7 @@ LPCRC = ./tools/lpcrc
 CPU_TYPE = cortex-m3
 LD_SCRIPT = LPC1343_flash.ld
 
-COMMON_FLAGS = -c -g -Os $(INCLUDE_PATHS) -Wall -mthumb \
+COMMON_FLAGS = -c -g -O0 $(INCLUDE_PATHS) -Wall -mthumb \
 	-ffunction-sections -fdata-sections -fmessage-length=0 \
 	-mcpu=$(CPU_TYPE) 
 
