@@ -1,0 +1,3 @@
+[submodule "firmware/LPC1343CodeBase"]
+	path = firmware/LPC1343CodeBase
+	url = git@github.com:microbuilder/LPC1343CodeBase.git
