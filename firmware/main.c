@@ -20,6 +20,9 @@ int main() {
     while ( !(SCB_CLKOUTCLKUEN & 0x01) );
     SCB_CLKOUTCLKDIV = SCB_CLKOUTCLKDIV_DIV1;
 
+    // set PIO0.1 to CLKOUT function
+    IOCON_PIO0_1 = IOCON_PIO0_1_FUNC_CLKOUT | IOCON_PIO0_1_HYS_DISABLE | IOCON_COMMON_MODE_INACTIVE;
+
     uartInit(31250);
 
     while (1) {
