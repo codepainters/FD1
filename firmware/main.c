@@ -4,6 +4,8 @@
 #include "uart/uart.h"
 #include "lpc134x.h"
 
+#include "display.h"
+
 volatile int timerCount = 0;
 volatile int idx = -9;
 
@@ -12,16 +14,7 @@ int main() {
 
 	cpuInit();
 
-    // main clock to CLKOUT pin
-    SCB_CLKOUTCLKSEL = 0x3;
-    SCB_CLKOUTCLKUEN = SCB_CLKOUTCLKUEN_UPDATE;
-    SCB_CLKOUTCLKUEN = SCB_CLKOUTCLKUEN_DISABLE;
-    SCB_CLKOUTCLKUEN = SCB_CLKOUTCLKUEN_UPDATE;
-    while ( !(SCB_CLKOUTCLKUEN & 0x01) );
-    SCB_CLKOUTCLKDIV = SCB_CLKOUTCLKDIV_DIV1;
-
-    // set PIO0.1 to CLKOUT function
-    IOCON_PIO0_1 = IOCON_PIO0_1_FUNC_CLKOUT | IOCON_PIO0_1_HYS_DISABLE | IOCON_COMMON_MODE_INACTIVE;
+    Display_Init();
 
     uartInit(31250);
 
