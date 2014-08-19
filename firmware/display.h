@@ -1,3 +1,5 @@
+#ifndef __DISPLAY_H__
+#define __DISPLAY_H__
 
 void Display_Init();
 
@@ -15,4 +17,4 @@ enum DisplayLed {
 
 void Display_SetLeds(int state);
 
-
+#endif // __DISPLAY_H__

@@ -1,4 +1,5 @@
 #include "display.h"
+#include "buttons.h"
 
 #include "lpc134x.h"
 #include "ssp/ssp.h"

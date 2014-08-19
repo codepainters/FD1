@@ -5,7 +5,7 @@
 # ------------------------------------------------------------------------
 
 INCLUDE_PATHS = -I. 
-OBJS = main.o display.o
+OBJS = main.o display.o buttons.o
 
 # ------------------------------------------------------------------------
 # Files from LPC1343CodeBase library
