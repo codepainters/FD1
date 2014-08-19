@@ -3,7 +3,8 @@
 #include "lpc134x.h"
 #include "ssp/ssp.h"
 
-static void Display_SetSegments(uint8_t state);
+static void Display_SetDigitPin(uint32_t digit, bool active);
+static void Display_SetSegments(uint32_t digit, uint8_t state);
 
 #define HC595_STRB_PORT     (1)
 #define HC595_STRB_PIN      (2)
@@ -13,9 +14,9 @@ struct {
     uint32_t port;
     uint32_t pin;
 } digitPin[] ={
-    { &IOCON_PIO2_3, 2, 3 },
+    { &IOCON_PIO2_0, 2, 0 },
     { &IOCON_PIO2_6, 2, 6 },
-    { &IOCON_PIO2_0, 2, 0 }
+    { &IOCON_PIO2_3, 2, 3 }
 };
 
 #define P_DIG1_PORT (2)
@@ -25,13 +26,22 @@ struct {
 #define P_DIG3_PORT (2)
 #define P_DIG3_PIN  (0)
 
+#define BLANK (0xFF)
+
+static const uint8_t hexDigit[] = {
+    0x11, 0xD7, 0x32, 0x92, // 0, 1, 2, 3
+    0xD4, 0x98, 0x18, 0xD3, // 4, 5, 6, 7
+    0x10, 0x90, 0x50, 0x1C, // 8, 9, A, B
+    0x39, 0x16, 0x38, 0x78  // C, D, E, F
+};
+
 void Display_Init()
 {
     int i;
-    // Note: sspInit() reconfigures PIO0_2!
 
     // HC595 shifts on rising clock edge, hence we set clock to be high when idle
     // and let the transition occur on the falling edge
+    // Note: sspInit() reconfigures PIO0_2!
     sspInit(0, sspClockPolarity_High, sspClockPhase_FallingEdge);
 
     // HC595 load strobe pin - PIO1.2
@@ -46,22 +56,40 @@ void Display_Init()
         *digitPin[i].ioconReg |= IOCON_PIO2_0_FUNC_GPIO;
 
         gpioSetDir(digitPin[i].port, digitPin[i].pin, gpioDirection_Output);
-        gpioSetValue(digitPin[i].port, digitPin[i].pin, 1);
+        gpioSetValue(digitPin[i].port, digitPin[i].pin, 0);
     }
 
-    Display_SetSegments(0xF0);
+    Display_SetSegments(0, 0x70);
 
-    gpioSetValue(digitPin[0].port, digitPin[0].pin, 1);
-    gpioSetValue(digitPin[1].port, digitPin[1].pin, 0);
-    gpioSetValue(digitPin[2].port, digitPin[2].pin, 0);
+    showDigit(0);
 }
 
-static void Display_SetSegments(uint8_t state)
+void showDigit(int i)
 {
+    Display_SetSegments(0, hexDigit[i]);
+}
+
+static void Display_SetDigitPin(uint32_t i, bool active)
+{
+    gpioSetDir(digitPin[i].port, digitPin[i].pin, active ? gpioDirection_Output : gpioDirection_Input);
+}
+
+static void Display_SetSegments(uint32_t digit, uint8_t state)
+{
+    unsigned int i;
+
     // send single byte
     sspSend(0, &state, 1);
+
+    // blank all
+    for (i = 0; i < sizeof(digitPin) / sizeof(digitPin[0]); i++) {
+        Display_SetDigitPin(i, 0);
+    }
 
     // pulse STRB, so shit register is loaded into output register
     gpioSetValue(HC595_STRB_PORT, HC595_STRB_PIN, 0);
     gpioSetValue(HC595_STRB_PORT, HC595_STRB_PIN, 1);
+
+    // enable given digit
+    Display_SetDigitPin(digit, 1);
 }
