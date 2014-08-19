@@ -6,6 +6,9 @@
 static void Display_SetDigitPin(uint32_t digit, bool active);
 static void Display_SetSegments(uint32_t digit, uint8_t state);
 
+// Note: LEDs act as a special 3rd digit
+#define DISPLAY_DIGITS      (3)
+
 #define HC595_STRB_PORT     (1)
 #define HC595_STRB_PIN      (2)
 
@@ -26,14 +29,19 @@ struct {
 #define P_DIG3_PORT (2)
 #define P_DIG3_PIN  (0)
 
-#define BLANK (0xFF)
-
 static const uint8_t hexDigit[] = {
     0x11, 0xD7, 0x32, 0x92, // 0, 1, 2, 3
     0xD4, 0x98, 0x18, 0xD3, // 4, 5, 6, 7
     0x10, 0x90, 0x50, 0x1C, // 8, 9, A, B
     0x39, 0x16, 0x38, 0x78  // C, D, E, F
 };
+
+#define SEGMENTS_BLANK (0xFF)
+#define SEGMENTS_DASH  (0xFE)
+#define SEGMENTS_MONE  (0xD6)
+
+static volatile int digitIdx = 0;
+static volatile int digit[DISPLAY_DIGITS] = { SEGMENTS_BLANK, SEGMENTS_BLANK, SEGMENTS_BLANK };
 
 void Display_Init()
 {
@@ -57,16 +65,48 @@ void Display_Init()
 
         gpioSetDir(digitPin[i].port, digitPin[i].pin, gpioDirection_Output);
         gpioSetValue(digitPin[i].port, digitPin[i].pin, 0);
+
+        // TODO: ensure no pull-up/down is enabled
     }
-
-    Display_SetSegments(0, 0x70);
-
-    showDigit(0);
 }
 
-void showDigit(int i)
+void Display_TimerTick()
 {
-    Display_SetSegments(0, hexDigit[i]);
+    Display_SetSegments(digitIdx, digit[digitIdx]);
+
+    digitIdx = (digitIdx + 1) % DISPLAY_DIGITS;
+}
+
+void Display_SetInt(int aValue)
+{
+    // Note: value has to be -19 .. 99
+    int absValue = (aValue < 0) ? -aValue : aValue;
+    int l = absValue % 10;
+    int h = absValue / 10;
+
+    digit[1] = hexDigit[l];
+
+    if (aValue < -9) {
+        // if -10 or less, show "minus one" on the 1st digit
+        digit[0] = SEGMENTS_MONE;
+    }
+    else if (aValue < 0) {
+        // if -9..-1, show dash on the 1st digit
+        digit[0] = SEGMENTS_DASH;
+    }
+    else if (h == 0) {
+        // no leading zero
+        digit[0] = SEGMENTS_BLANK;
+    }
+    else {
+        digit[0] = hexDigit[h];
+    }
+}
+
+void Display_SetHex(int aValue)
+{
+    digit[0] = hexDigit[(aValue >> 4) & 0x0F];
+    digit[1] = hexDigit[aValue & 0x0F];
 }
 
 static void Display_SetDigitPin(uint32_t i, bool active)
@@ -93,3 +133,5 @@ static void Display_SetSegments(uint32_t digit, uint8_t state)
     // enable given digit
     Display_SetDigitPin(digit, 1);
 }
+
+
