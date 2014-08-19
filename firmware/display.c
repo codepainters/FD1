@@ -78,6 +78,7 @@ void Display_Init()
 void Display_TimerTick()
 {
     Display_SetSegments(digitIdx, digit[digitIdx]);
+    Buttons_CheckState(digitIdx);
 
     digitIdx = (digitIdx + 1) % DISPLAY_DIGITS;
 }

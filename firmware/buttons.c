@@ -11,6 +11,13 @@ struct {
     { &IOCON_JTAG_TDO_PIO1_1, 1, 1 }
 };
 
+#define COLUMN_ENCODER  (0)
+#define COLUMN_PBUTTON  (1)
+
+#define ROW_PBUTTON     (1)
+
+static void Buttons_HandlePButton();
+
 void Buttons_Init()
 {
     int i;
@@ -21,12 +28,31 @@ void Buttons_Init()
         *rowPin[i].ioconReg |= IOCON_JTAG_TMS_PIO1_0_FUNC_GPIO;
 
         gpioSetDir(rowPin[i].port, rowPin[i].pin, gpioDirection_Input);
-        gpioSetPullup(&rowPin[i].ioconReg, gpioPullupMode_PullUp);
+        gpioSetPullup(rowPin[i].ioconReg, gpioPullupMode_PullUp);
     }
 }
 
 void Buttons_CheckState(int column)
 {
+    if (column == COLUMN_ENCODER) {
 
+    }
+    else if (column == COLUMN_PBUTTON) {
+
+    }
+    Buttons_HandlePButton();
+}
+
+// FIXME: remove test code
+void Display_SetInt(int aValue);
+
+void Buttons_HandlePButton()
+{
+    uint32_t val = gpioGetValue(rowPin[ROW_PBUTTON].port, rowPin[ROW_PBUTTON].pin);
+
+    // FIXME: remove test code
+    if (val == 0) {
+        Display_SetInt(77);
+    }
 }
 
