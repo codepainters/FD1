@@ -37,7 +37,7 @@ SIZE = $(CROSS_COMPILE)size
 OBJCOPY = $(CROSS_COMPILE)objcopy
 OBJDUMP = $(CROSS_COMPILE)objdump
 OUTFILE = firmware
-LPCRC = ./tools/lpcrc
+LPCRC = python ./tools/lpcrc.py
 
 # ------------------------------------------------------------------------
 # Compiler settings, parameters and flags
