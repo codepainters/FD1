@@ -7,3 +7,12 @@ void Display_SetInt(int aValue);
 
 void Display_SetHex(int aValue);
 
+enum DisplayLed {
+    Display_LED1 = 1 << 0,
+    Display_LED2 = 1 << 1,
+    Display_LED3 = 1 << 2
+};
+
+void Display_SetLeds(int state);
+
+

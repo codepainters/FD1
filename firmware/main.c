@@ -46,6 +46,7 @@ void TIMER16_0_IRQHandler(void) {
     if ((timerCount % 10000) == 0) {
         idx ++;
         Display_SetHex(idx);
+        Display_SetLeds(idx);
     }
 
 }

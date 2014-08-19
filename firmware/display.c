@@ -40,6 +40,10 @@ static const uint8_t hexDigit[] = {
 #define SEGMENTS_DASH  (0xFE)
 #define SEGMENTS_MONE  (0xD6)
 
+#define SEGMENTS_LED1   (0xFB)
+#define SEGMENTS_LED2   (0xFE)
+#define SEGMENTS_LED3   (0xF7)
+
 static volatile int digitIdx = 0;
 static volatile int digit[DISPLAY_DIGITS] = { SEGMENTS_BLANK, SEGMENTS_BLANK, SEGMENTS_BLANK };
 
@@ -107,6 +111,14 @@ void Display_SetHex(int aValue)
 {
     digit[0] = hexDigit[(aValue >> 4) & 0x0F];
     digit[1] = hexDigit[aValue & 0x0F];
+}
+
+void Display_SetLeds(int state)
+{
+    digit[2] =
+            (state & Display_LED1 ? SEGMENTS_LED1 : 0x0FF) &
+            (state & Display_LED2 ? SEGMENTS_LED2 : 0x0FF) &
+            (state & Display_LED3 ? SEGMENTS_LED3 : 0x0FF);
 }
 
 static void Display_SetDigitPin(uint32_t i, bool active)
