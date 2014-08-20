@@ -38,9 +38,8 @@ void Buttons_CheckState(int column)
 
     }
     else if (column == COLUMN_PBUTTON) {
-
+        Buttons_HandlePButton();
     }
-    Buttons_HandlePButton();
 }
 
 // FIXME: remove test code
@@ -48,6 +47,12 @@ void Display_SetInt(int aValue);
 
 void Buttons_HandlePButton()
 {
+    int i;
+
+        for (i = 0; i < 100; i++) {
+             __asm volatile ("NOP");
+        }
+
     uint32_t val = gpioGetValue(rowPin[ROW_PBUTTON].port, rowPin[ROW_PBUTTON].pin);
 
     // FIXME: remove test code

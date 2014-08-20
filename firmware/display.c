@@ -125,7 +125,15 @@ void Display_SetLeds(int state)
 
 static void Display_SetDigitPin(uint32_t i, bool active)
 {
-    gpioSetDir(digitPin[i].port, digitPin[i].pin, active ? gpioDirection_Output : gpioDirection_Input);
+    if (active) {
+        gpioSetDir(digitPin[i].port, digitPin[i].pin, gpioDirection_Output);
+        // Note: when GPIO is switched from input to output, it is set to
+        // its previous input value, hence we need to set the pin to 0 again
+        gpioSetValue(digitPin[i].port, digitPin[i].pin, 0);
+    }
+    else {
+        gpioSetDir(digitPin[i].port, digitPin[i].pin, gpioDirection_Input);
+    }
 }
 
 static void Display_SetSegments(uint32_t digit, uint8_t state)
