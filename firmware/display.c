@@ -12,8 +12,8 @@ static volatile int digitIdx = 0;
 // current state of each digit's segments
 static volatile int digit[DISPLAY_DIGITS] = { SEGMENTS_BLANK, SEGMENTS_BLANK, SEGMENTS_BLANK };
 
+static void Display_SetSegments(uint32_t segments);
 static void Display_SetDigitPin(uint32_t digit, bool active);
-static void Display_SetSegments(uint32_t digit, uint8_t state);
 
 void Display_Init()
 {
@@ -30,12 +30,50 @@ void Display_Init()
     }
 }
 
+static void Display_SetSegments(uint32_t segments)
+{
+    uint8_t Dummy = Dummy;
+
+    // Note: TX FIFO should be empty here
+    while ((SSP_SSP0SR & (SSP_SSP0SR_TNF_NOTFULL | SSP_SSP0SR_BSY_BUSY)) != SSP_SSP0SR_TNF_NOTFULL);
+    SSP_SSP0DR = segments;
+
+    // TODO: is there any way to avoid draining RX FIFO? or do it in the background?
+    while ( (SSP_SSP0SR & (SSP_SSP0SR_BSY_BUSY|SSP_SSP0SR_RNE_NOTEMPTY)) != SSP_SSP0SR_RNE_NOTEMPTY );
+    Dummy = SSP_SSP0DR;
+}
+
 void Display_TimerTick()
 {
-    Display_SetSegments(digitIdx, digit[digitIdx]);
+    unsigned int i;
+
+    // Note: as silly as it sounds, LPC1343 is unable to generate an interrupt at the end
+    // of the SPI transfer! There's only "TX FIFO half-empty interrupt"!
+    // See e.g. http://www.lpcware.com/content/forum/interrupt-driven-spi
+    //
+    // For this reason we initiated SPI transfer at the end of the tick, simply assuming it
+    // is going to be ready before the next tick
+
+
+    // blank all
+    for (i = 0; i < sizeof(DISPLAY_DIGIT_PIN) / sizeof(DISPLAY_DIGIT_PIN[0]); i++) {
+        Display_SetDigitPin(i, 0);
+    }
+
+    // pulse STRB, so shit register is loaded into output register
+    gpioSetValue(HC595_STROBE_PORT, HC595_STROBE_PIN, 0);
+    gpioSetValue(HC595_STROBE_PORT, HC595_STROBE_PIN, 1);
+
+    // enable given digit
+    Display_SetDigitPin(digitIdx, 1);
+
+    // ..and let buttons check the state
     Buttons_CheckState(digitIdx);
 
+    // now we can prepare for the next digit
     digitIdx = (digitIdx + 1) % DISPLAY_DIGITS;
+
+    Display_SetSegments(digit[digitIdx]);
 }
 
 void Display_SetInt(int aValue)
@@ -95,25 +133,4 @@ static void Display_SetDigitPin(uint32_t i, bool active)
         gpioSetDir(pin->portNum, pin->pinNum, gpioDirection_Input);
     }
 }
-
-static void Display_SetSegments(uint32_t digit, uint8_t state)
-{
-    unsigned int i;
-
-    // send segments byte to HC595
-    sspSend(0, &state, 1);
-
-    // blank all
-    for (i = 0; i < sizeof(DISPLAY_DIGIT_PIN) / sizeof(DISPLAY_DIGIT_PIN[0]); i++) {
-        Display_SetDigitPin(i, 0);
-    }
-
-    // pulse STRB, so shit register is loaded into output register
-    gpioSetValue(HC595_STROBE_PORT, HC595_STROBE_PIN, 0);
-    gpioSetValue(HC595_STROBE_PORT, HC595_STROBE_PIN, 1);
-
-    // enable given digit
-    Display_SetDigitPin(digit, 1);
-}
-
 
