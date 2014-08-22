@@ -5,7 +5,7 @@
 # ------------------------------------------------------------------------
 
 INCLUDE_PATHS = -I. 
-OBJS = main.o display.o buttons.o
+OBJS = main.o display.o buttons.o gpio_pin.o
 
 # ------------------------------------------------------------------------
 # Files from LPC1343CodeBase library
@@ -29,7 +29,7 @@ OBJS += $(LPC1XXX_PATH)/LPC13xx_handlers.o $(LPC1XXX_PATH)/LPC1xxx_startup.o
 # GNU GCC toolkit settings
 # ------------------------------------------------------------------------
 
-CROSS_COMPILE = arm-none-eabi-
+CROSS_COMPILE = /opt/gcc-arm-none-eabi-4_8-2014q2/bin/arm-none-eabi-
 AS = $(CROSS_COMPILE)gcc
 CC = $(CROSS_COMPILE)gcc
 LD = $(CROSS_COMPILE)gcc
