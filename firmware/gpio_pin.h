@@ -22,4 +22,9 @@ typedef const struct GpioPin_tag {
  */
 void GpioPin_ConfigureOut(const GpioPin_t* pin, int initialState);
 
+/**
+ * Configure a given pin as GPIO input
+ */
+void GpioPin_ConfigureIn(const GpioPin_t* pin);
+
 #endif // __PINS_H__

@@ -39,13 +39,13 @@ void TIMER16_0_IRQHandler(void) {
 
     timerCount++;
 
-    if ((timerCount & 0x0F) == 0) {
+    //if ((timerCount & 0x0F) == 0) {
         Display_TimerTick();
-    }
+    //}
 
     if ((timerCount % 10000) == 0) {
         idx ++;
-        Display_SetHex(idx);
+        //Display_SetHex(idx);
         Display_SetLeds(idx);
     }
 

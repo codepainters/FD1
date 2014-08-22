@@ -2,9 +2,9 @@
 #include "ssp/ssp.h"
 
 #include "display.h"
+#include "display_defs.h"
 #include "buttons.h"
 #include "gpio_pin.h"
-#include "board.h"
 
 // index of the currently displayed digit
 static volatile int digitIdx = 0;

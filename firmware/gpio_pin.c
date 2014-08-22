@@ -7,3 +7,9 @@ void GpioPin_ConfigureOut(const GpioPin_t* pin, int initialState)
     *pin->ioconReg = pin->ioconInitVal;
     gpioSetDir(pin->portNum, pin->pinNum, gpioDirection_Output);
 }
+
+void GpioPin_ConfigureIn(const GpioPin_t* pin)
+{
+    *pin->ioconReg = pin->ioconInitVal;
+    gpioSetDir(pin->portNum, pin->pinNum, gpioDirection_Input);
+}

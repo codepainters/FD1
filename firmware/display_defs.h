@@ -1,14 +1,10 @@
 #ifndef __BOARD_H__
 #define __BOARD_H__
 
-#include "gpio/gpio.h"
+#include "gpio_pin.h"
 
 // FIXME: update LPC1343CodeBase header
 #define IOCON_PIO2_3_FUNC_GPIO  0x00
-
-/*
- * This file defines board-specific pin assignment, and other board-specific constants.
- */
 
 // Note: LEDs act as a special 3rd digit
 #define DISPLAY_DIGITS      (3)
@@ -50,6 +46,5 @@ static const uint8_t SEGMENTS_HEX[] = {
 #define SEGMENTS_LED1   (0xFB)
 #define SEGMENTS_LED2   (0xFE)
 #define SEGMENTS_LED3   (0xF7)
-
 
 #endif // __BOARD_H__
