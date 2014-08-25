@@ -3,6 +3,12 @@
 
 #include "lpc134x.h"
 
+#define MIDI_CHANNEL_MIN    (0)
+#define MIDI_CHANNEL_MAX    (15)
+
+#define MIDI_VELOCITY_MIN   (0)
+#define MIDI_VELOCITY_MAX   (127)
+
 /**
  * This structure contains all the user-settable parameters.
  */

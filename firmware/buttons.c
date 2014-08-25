@@ -5,6 +5,9 @@
 #include "buttons.h"
 #include "buttons_defs.h"
 #include "gpio_pin.h"
+#include "panel.h"
+
+#define DEBOUNCE_DURATION  (100)
 
 // encoder FSM states
 typedef enum {
@@ -16,16 +19,24 @@ typedef enum {
 
 // encoder FSM transitions
 static EncoderState_t encoderFsm[][4] = {
-    [ENC_START] = 		{ ENC_START, ENC_CW_BEGIN, ENC_CCW_BEGIN, ENC_START },
-    [ENC_CW_BEGIN] =	{ ENC_CW_NEXT, ENC_CW_BEGIN, ENC_START, ENC_START },
-    [ENC_CW_NEXT] =		{ ENC_CW_NEXT, ENC_CW_BEGIN, ENC_CW_FINAL, ENC_START },
-    [ENC_CW_FINAL] =	{ ENC_CW_NEXT, ENC_START, ENC_CW_FINAL, ENC_START | ENC_EMIT_CW },
-    [ENC_CCW_BEGIN] =	{ ENC_CCW_NEXT, ENC_START, ENC_CCW_BEGIN, ENC_START },
-    [ENC_CCW_FINAL] =	{ ENC_CCW_NEXT, ENC_CCW_FINAL, ENC_START, ENC_START | ENC_EMIT_CCW },
-    [ENC_CCW_NEXT] =	{ ENC_CCW_NEXT, ENC_CCW_FINAL, ENC_CCW_BEGIN, ENC_START }
+    /* ENC_START */     { ENC_START, ENC_CCW_BEGIN, ENC_CW_BEGIN, ENC_START },
+    /* ENC_CW_BEGIN */  { ENC_START, ENC_CW_NEXT,   ENC_START,    ENC_CW_BEGIN },
+    /* ENC_CW_NEXT */   { ENC_START, ENC_CW_NEXT,   ENC_CW_FINAL, ENC_CW_BEGIN },
+    /* ENC_CW_FINAL */	{ ENC_START | ENC_EMIT_CW, ENC_CW_NEXT, ENC_CW_FINAL, ENC_START },
+    /* ENC_CCW_BEGIN */	{ ENC_START, ENC_CCW_NEXT, ENC_CCW_BEGIN, ENC_START },
+    /* ENC_CCW_FINAL */	{ ENC_START | ENC_EMIT_CCW, ENC_CCW_NEXT, ENC_START, ENC_CCW_FINAL },
+    /* ENC_CCW_NEXT */	{ ENC_START, ENC_CCW_NEXT, ENC_CCW_BEGIN, ENC_CCW_FINAL }
 };
 
 static EncoderState_t encoderState;
+
+typedef struct {
+    unsigned int pressDuration;
+    unsigned int previousState;
+} ButtonState_t;
+
+// Note: we only have one push button, but let's make it somewhat generic
+ButtonState_t pushButton = {0, 0};
 
 static void Buttons_HandlePButton();
 static void Buttons_HandleEncoder();
@@ -46,27 +57,36 @@ void Buttons_CheckState(int column)
         Buttons_HandleEncoder();
     }
     else if (column == COLUMN_PBUTTON) {
-        Buttons_HandlePButton();
+        Buttons_HandlePButton(&pushButton);
     }
 }
-
-void Display_SetInt(int aValue);
 
 static void Buttons_HandlePButton()
 {
     uint32_t val = gpioGetValue(ROW_PINS[ROW_PB2].portNum, ROW_PINS[ROW_PB2].pinNum);
-    if (val == 0) {
-        Display_SetInt(77);
-    }
-}
 
-static int32_t v = 50;
+    // debouncing logic
+    if (val == pushButton.previousState) {
+        if (pushButton.pressDuration < DEBOUNCE_DURATION) {
+            pushButton.previousState++;
+        }
+        else if (pushButton.pressDuration == DEBOUNCE_DURATION)  {
+            Panel_HandleButtonAction(val == 0 ? ACTION_PBUTTON_PRESS : ACTION_PBUTTON_RELEASE);
+            pushButton.previousState++;
+        }
+    }
+    else {
+        pushButton.pressDuration = 0;
+    }
+
+    pushButton.previousState = val;
+}
 
 static void Buttons_HandleEncoder()
 {
     uint32_t pin1 = gpioGetValue(ROW_PINS[ROW_PB1].portNum, ROW_PINS[ROW_PB1].pinNum);
     uint32_t pin2 = gpioGetValue(ROW_PINS[ROW_PB2].portNum, ROW_PINS[ROW_PB2].pinNum);
-    uint32_t inputs = ((pin1 << 1) | pin2) ^0x03;
+    uint32_t inputs = (pin1 << 1) | pin2;
 
     // make the FSM transition (note that we need to mask the ENC_EMIT_xxx flags)
     int nextState = encoderFsm[encoderState][inputs];
@@ -74,9 +94,9 @@ static void Buttons_HandleEncoder()
 
     // note: encoderDelta is basically the last tick, it is zero'ed after reading
     if (nextState & ENC_EMIT_CW) {
-        Display_SetInt(--v);
+        Panel_HandleButtonAction(ACTION_ENCODER_CW);
     }
     else if (nextState & ENC_EMIT_CCW) {
-        Display_SetInt(++v);
+        Panel_HandleButtonAction(ACTION_ENCODER_CCW);
     }
 }

@@ -4,6 +4,7 @@
 #include "uart/uart.h"
 #include "lpc134x.h"
 
+#include "panel.h"
 #include "display.h"
 
 volatile int timerCount = 0;
@@ -14,7 +15,7 @@ int main() {
 
 	cpuInit();
 
-    Display_Init();
+    Panel_Init();
 
     timer16Init(0, TIMER16_CCLK_100US);
     timer16Enable(0);

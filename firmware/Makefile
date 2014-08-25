@@ -5,7 +5,7 @@
 # ------------------------------------------------------------------------
 
 INCLUDE_PATHS = -I. 
-OBJS = main.o display.o buttons.o gpio_pin.o settings.o
+OBJS = main.o display.o buttons.o gpio_pin.o settings.o panel.o
 
 # ------------------------------------------------------------------------
 # Files from LPC1343CodeBase library
