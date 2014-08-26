@@ -19,13 +19,13 @@ typedef enum {
 
 // encoder FSM transitions
 static EncoderState_t encoderFsm[][4] = {
-    /* ENC_START */     { ENC_START, ENC_CCW_BEGIN, ENC_CW_BEGIN, ENC_START },
-    /* ENC_CW_BEGIN */  { ENC_START, ENC_CW_NEXT,   ENC_START,    ENC_CW_BEGIN },
-    /* ENC_CW_NEXT */   { ENC_START, ENC_CW_NEXT,   ENC_CW_FINAL, ENC_CW_BEGIN },
-    /* ENC_CW_FINAL */	{ ENC_START | ENC_EMIT_CW, ENC_CW_NEXT, ENC_CW_FINAL, ENC_START },
-    /* ENC_CCW_BEGIN */	{ ENC_START, ENC_CCW_NEXT, ENC_CCW_BEGIN, ENC_START },
-    /* ENC_CCW_FINAL */	{ ENC_START | ENC_EMIT_CCW, ENC_CCW_NEXT, ENC_START, ENC_CCW_FINAL },
-    /* ENC_CCW_NEXT */	{ ENC_START, ENC_CCW_NEXT, ENC_CCW_BEGIN, ENC_CCW_FINAL }
+    [ENC_START] = 		{ ENC_START, ENC_CW_BEGIN, ENC_CCW_BEGIN, ENC_START },
+    [ENC_CW_BEGIN] =	{ ENC_CW_NEXT, ENC_CW_BEGIN, ENC_START, ENC_START },
+    [ENC_CW_NEXT] =		{ ENC_CW_NEXT, ENC_CW_BEGIN, ENC_CW_FINAL, ENC_START },
+    [ENC_CW_FINAL] =	{ ENC_CW_NEXT, ENC_START, ENC_CW_FINAL, ENC_START | ENC_EMIT_CW },
+    [ENC_CCW_BEGIN] =	{ ENC_CCW_NEXT, ENC_START, ENC_CCW_BEGIN, ENC_START },
+    [ENC_CCW_FINAL] =	{ ENC_CCW_NEXT, ENC_CCW_FINAL, ENC_START, ENC_START | ENC_EMIT_CCW },
+    [ENC_CCW_NEXT] =	{ ENC_CCW_NEXT, ENC_CCW_FINAL, ENC_CCW_BEGIN, ENC_START }
 };
 
 static EncoderState_t encoderState;
@@ -86,7 +86,7 @@ static void Buttons_HandleEncoder()
 {
     uint32_t pin1 = gpioGetValue(ROW_PINS[ROW_PB1].portNum, ROW_PINS[ROW_PB1].pinNum);
     uint32_t pin2 = gpioGetValue(ROW_PINS[ROW_PB2].portNum, ROW_PINS[ROW_PB2].pinNum);
-    uint32_t inputs = (pin1 << 1) | pin2;
+    uint32_t inputs = ((pin1 << 1) | pin2) ^ 0x03;
 
     // make the FSM transition (note that we need to mask the ENC_EMIT_xxx flags)
     int nextState = encoderFsm[encoderState][inputs];
