@@ -15,7 +15,7 @@
 #define KBD_TOTAL_KEYS  (KBD_ROWS * KBD_COLUMNS)
 
 // convert row/column to key index, the left-most key has index 0
-#define KBD_KEY_INDEX(row, column)     (KBD_TOTAL_KEYS - ((row) * KBD_COLUMNS + (column)))
+#define KBD_KEY_INDEX(row, column)     (KBD_TOTAL_KEYS - ((row) * KBD_COLUMNS + (column)) - 1)
 
 // Input pins of the front panel matrix, with pull-ups
 GpioPin_t KBD_ROW_PINS[KBD_ROWS] ={
