@@ -10,8 +10,12 @@
  * R0/C0 is the right-most key, R3/C4 is the left-most key.
  */
 
-#define KBD_ROWS    (4)
-#define KBD_COLUMNS (5)
+#define KBD_ROWS        (4)
+#define KBD_COLUMNS     (5)
+#define KBD_TOTAL_KEYS  (KBD_ROWS * KBD_COLUMNS)
+
+// convert row/column to key index, the left-most key has index 0
+#define KBD_KEY_INDEX(row, column)     (KBD_TOTAL_KEYS - ((row) * KBD_COLUMNS + (column)))
 
 // Input pins of the front panel matrix, with pull-ups
 GpioPin_t KBD_ROW_PINS[KBD_ROWS] ={
