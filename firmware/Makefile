@@ -5,7 +5,7 @@
 # ------------------------------------------------------------------------
 
 INCLUDE_PATHS = -I. 
-OBJS = main.o display.o buttons.o gpio_pin.o settings.o panel.o
+OBJS = main.o display.o buttons.o gpio_pin.o settings.o panel.o keyboard.o
 
 # ------------------------------------------------------------------------
 # Files from LPC1343CodeBase library
@@ -29,7 +29,7 @@ OBJS += $(LPC1XXX_PATH)/LPC13xx_handlers.o $(LPC1XXX_PATH)/LPC1xxx_startup.o
 # GNU GCC toolkit settings
 # ------------------------------------------------------------------------
 
-CROSS_COMPILE = /opt/gcc-arm-none-eabi-4_8-2014q2/bin/arm-none-eabi-
+CROSS_COMPILE = arm-none-eabi-
 AS = $(CROSS_COMPILE)gcc
 CC = $(CROSS_COMPILE)gcc
 LD = $(CROSS_COMPILE)gcc
@@ -46,7 +46,7 @@ LPCRC = python ./tools/lpcrc.py
 CPU_TYPE = cortex-m3
 LD_SCRIPT = LPC1343_flash.ld
 
-COMMON_FLAGS = -c -g -O0 $(INCLUDE_PATHS) -Wall -mthumb \
+COMMON_FLAGS = -c -g -O0 $(INCLUDE_PATHS) -std=c99 -Wall -mthumb \
 	-ffunction-sections -fdata-sections -fmessage-length=0 \
 	-mcpu=$(CPU_TYPE) 
 

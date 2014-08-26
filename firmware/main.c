@@ -5,7 +5,7 @@
 #include "lpc134x.h"
 
 #include "panel.h"
-#include "display.h"
+#include "keyboard.h"
 
 volatile int timerCount = 0;
 volatile int idx = 0;
@@ -15,6 +15,7 @@ int main() {
 
 	cpuInit();
 
+    Keyboard_Init();
     Panel_Init();
 
     timer16Init(0, TIMER16_CCLK_100US);
