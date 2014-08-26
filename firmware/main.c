@@ -9,8 +9,21 @@
 
 volatile int timerCount = 0;
 
+#define DEBUG_PIN 1
+
+#if DEBUG_PIN
+#define SET_DEBUG_PIN(v) do { gpioSetValue(0, 1, (v)); } while(0)
+#else
+#define SET_DEBUG_PIN(v)
+#endif
+
 int main() {
 	cpuInit();
+
+#if DEBUG_PIN
+    IOCON_PIO0_1 = IOCON_PIO0_1_FUNC_GPIO | IOCON_PIO0_1_HYS_DISABLE | IOCON_PIO0_1_MODE_INACTIVE;
+    gpioSetDir(0, 1, gpioDirection_Output);
+#endif
 
     // intiailize sub-modules
     MIDI_Init();
@@ -39,8 +52,12 @@ void TIMER16_0_IRQHandler(void) {
     // Clear the interrupt flag
     TMR_TMR16B0IR = TMR_TMR16B0IR_MR0;
 
+    SET_DEBUG_PIN(1);
+
     Keyboard_TimerTick();
 
     // Note: encoder needs such a high rate (10kHz / 3) to work reliably!
     Panel_TimerTick();
+
+    SET_DEBUG_PIN(0);
 }
