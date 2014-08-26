@@ -103,7 +103,7 @@ static void Keyboard_HandleKeyAction(unsigned int index)
     }
     else if (key->noteOnSent) {
         // NOTE ON was previously sent and key was just depressed -> send NOTE OFF
-        MIDI_QueueNoteOff(key->midiChannel, key->midiNote);
+        MIDI_QueueNoteOff(key->midiChannel, key->midiNote, key->midiVelocity);
         key->noteOnSent = false;
     }
 }
