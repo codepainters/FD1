@@ -27,8 +27,11 @@ int main() {
 
     // intiailize sub-modules
     MIDI_Init();
-    Keyboard_Init();
     Panel_Init();
+
+    // FIXME: panel must be configured first at the moment,
+    // as LPC1343CodeBase SPI driver reconfigures PIO0.2
+    Keyboard_Init();
 
     // configure timer to kick at 10kHz
     timer16Init(0, TIMER16_CCLK_100US);
