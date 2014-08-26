@@ -6,6 +6,9 @@
 #define MIDI_CHANNEL_MIN    (0)
 #define MIDI_CHANNEL_MAX    (15)
 
+#define OCTAVE_SHIFT_MIN    (0)
+#define OCTAVE_SHIFT_MAX    (5)
+
 #define MIDI_VELOCITY_MIN   (0)
 #define MIDI_VELOCITY_MAX   (127)
 
