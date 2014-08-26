@@ -11,7 +11,7 @@
 
 // encoder FSM states
 typedef enum {
-    ENC_START = 0, ENC_CW_FINAL, ENC_CW_BEGIN, ENC_CW_NEXT, ENC_CCW_BEGIN, ENC_CCW_FINAL, ENC_CCW_NEXT,
+    ENC_START = 0, ENC_CW_BEGIN, ENC_CW_NEXT, ENC_CW_FINAL, ENC_CCW_BEGIN, ENC_CCW_NEXT, ENC_CCW_FINAL,
 
     ENC_EMIT_CW = 0x10,
     ENC_EMIT_CCW = 0x20
@@ -19,13 +19,13 @@ typedef enum {
 
 // encoder FSM transitions
 static EncoderState_t encoderFsm[][4] = {
-    [ENC_START] = 		{ ENC_START, ENC_CW_BEGIN, ENC_CCW_BEGIN, ENC_START },
-    [ENC_CW_BEGIN] =	{ ENC_CW_NEXT, ENC_CW_BEGIN, ENC_START, ENC_START },
-    [ENC_CW_NEXT] =		{ ENC_CW_NEXT, ENC_CW_BEGIN, ENC_CW_FINAL, ENC_START },
-    [ENC_CW_FINAL] =	{ ENC_CW_NEXT, ENC_START, ENC_CW_FINAL, ENC_START | ENC_EMIT_CW },
-    [ENC_CCW_BEGIN] =	{ ENC_CCW_NEXT, ENC_START, ENC_CCW_BEGIN, ENC_START },
-    [ENC_CCW_FINAL] =	{ ENC_CCW_NEXT, ENC_CCW_FINAL, ENC_START, ENC_START | ENC_EMIT_CCW },
-    [ENC_CCW_NEXT] =	{ ENC_CCW_NEXT, ENC_CCW_FINAL, ENC_CCW_BEGIN, ENC_START }
+    /* ENC_START */		{ ENC_START, ENC_CCW_BEGIN, ENC_CW_BEGIN, ENC_START },
+    /* ENC_CW_BEGIN */	{ ENC_START, ENC_START, ENC_CW_BEGIN, ENC_CW_NEXT },
+    /* ENC_CW_NEXT */	{ ENC_START, ENC_CW_FINAL, ENC_CW_BEGIN, ENC_CW_NEXT },
+    /* ENC_CW_FINAL */	{ ENC_START | ENC_EMIT_CW, ENC_CW_FINAL, ENC_START, ENC_CW_NEXT },
+    /* ENC_CCW_BEGIN */	{ ENC_START, ENC_CCW_BEGIN, ENC_START, ENC_CCW_NEXT },
+    /* ENC_CCW_NEXT */	{ ENC_START, ENC_CCW_BEGIN, ENC_CCW_FINAL, ENC_CCW_NEXT },
+    /* ENC_CCW_FINAL */	{ ENC_START | ENC_EMIT_CCW, ENC_START, ENC_CCW_FINAL, ENC_CCW_NEXT }
 };
 
 static EncoderState_t encoderState = ENC_START;
@@ -84,9 +84,10 @@ static void Buttons_HandlePButton()
 
 static void Buttons_HandleEncoder()
 {
+    // Pin 1 & 2 are 0 when encoder is idle
     uint32_t pin1 = gpioGetValue(ROW_PINS[ROW_PB1].portNum, ROW_PINS[ROW_PB1].pinNum);
     uint32_t pin2 = gpioGetValue(ROW_PINS[ROW_PB2].portNum, ROW_PINS[ROW_PB2].pinNum);
-    uint32_t inputs = ((pin1 << 1) | pin2) ^ 0x03;
+    uint32_t inputs = (pin2 << 1) | pin1;
 
     // make the FSM transition (note that we need to mask the ENC_EMIT_xxx flags)
     int nextState = encoderFsm[encoderState][inputs];
