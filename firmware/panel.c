@@ -18,8 +18,8 @@ static EditMode_t editMode = EDIT_CHANNEL;
 
 void Panel_Init()
 {
-    Display_Init();
     Buttons_Init();
+    Display_Init();
 
     Panel_UpdateDisplay();
 }
@@ -59,11 +59,11 @@ static void Panel_EditValue(int delta)
         break;
 
     case EDIT_VELOCITY:
-        settings.velocity += Panel_AdjustValue(settings.velocity, delta, MIDI_VELOCITY_MIN, MIDI_VELOCITY_MAX);
+        settings.velocity = Panel_AdjustValue(settings.velocity, delta, MIDI_VELOCITY_MIN, MIDI_VELOCITY_MAX);
         break;
 
     case EDIT_OCTAVE:
-        settings.octave += Panel_AdjustValue(settings.octave, delta, OCTAVE_SHIFT_MIN, OCTAVE_SHIFT_MAX);;
+        settings.octave = Panel_AdjustValue(settings.octave, delta, OCTAVE_SHIFT_MIN, OCTAVE_SHIFT_MAX);;
         break;
 
     default:
