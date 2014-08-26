@@ -36,6 +36,7 @@ void Keyboard_Init()
         keys[i].debounceCounter = 0;
         keys[i].previousState = 0;
         keys[i].pressed = false;
+        keys[i].noteOnSent = false;
     }
 
     for (int i = 0; i < KBD_ROWS; i++) {
@@ -46,14 +47,14 @@ void Keyboard_Init()
         GpioPin_ConfigureIn(&KBD_COLUMN_PINS[i]);
     }
 
+    gpioSetValue(KBD_ROW_PINS[currentScanRow].portNum, KBD_ROW_PINS[currentScanRow].pinNum, 0);
 }
 
 void Keyboard_TimerTick()
 {
-    // Disable current row and advance to next one
-    gpioSetValue(KBD_ROW_PINS[currentScanRow].portNum, KBD_ROW_PINS[currentScanRow].pinNum, 1);
-    currentScanRow = (currentScanRow + 1) % KBD_ROWS;
-    gpioSetValue(KBD_ROW_PINS[currentScanRow].portNum, KBD_ROW_PINS[currentScanRow].pinNum, 0);
+    // Note: column lines needs some time to charge/discharge, thus we can't read it back immediately after
+    // switching the row. On each cycle we read the row preselected on the previous one, thus giving a whole cycle
+    // for the values to settle.s
 
     for (unsigned int column = 0; column < KBD_COLUMNS; column++) {
         unsigned int state = gpioGetValue(KBD_COLUMN_PINS[column].portNum, KBD_COLUMN_PINS[column].pinNum) ^ 0x01;
@@ -83,6 +84,11 @@ void Keyboard_TimerTick()
 
         key->previousState = state;
     }
+
+    // Disable current row and advance to next one
+    gpioSetValue(KBD_ROW_PINS[currentScanRow].portNum, KBD_ROW_PINS[currentScanRow].pinNum, 1);
+    currentScanRow = (currentScanRow + 1) % KBD_ROWS;
+    gpioSetValue(KBD_ROW_PINS[currentScanRow].portNum, KBD_ROW_PINS[currentScanRow].pinNum, 0);
 }
 
 static void Keyboard_HandleKeyAction(unsigned int index)
