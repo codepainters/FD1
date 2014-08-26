@@ -1,5 +1,5 @@
-#ifndef __BOARD_H__
-#define __BOARD_H__
+#ifndef __DISPLAY_DEFS_H__
+#define __DISPLAY_DEFS_H__
 
 #include "gpio_pin.h"
 
@@ -47,4 +47,4 @@ static const uint8_t SEGMENTS_HEX[] = {
 #define SEGMENTS_LED2   (0xFE)
 #define SEGMENTS_LED3   (0xF7)
 
-#endif // __BOARD_H__
+#endif // __DISPLAY_DEFS_H__
