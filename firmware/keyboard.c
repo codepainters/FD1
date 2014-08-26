@@ -100,12 +100,14 @@ static void Keyboard_HandleKeyAction(unsigned int index)
     // key press is detected
 
     if(key->pressed) {
-        // set note parameters
-        key->midiChannel = settings.midiChannel;
-        key->midiVelocity = settings.velocity;
-        key->midiNote = KBD_LEFTMOST_NOTE + (settings.octave * 12) + index;
-
-        key->noteOnSent = MIDI_QueueNoteOn(key->midiChannel, key->midiNote, key->midiVelocity);
+        int note = KBD_LEFTMOST_NOTE + (settings.octave * 12) + index;
+        if (note >= 0) {
+            // set note parameters
+            key->midiChannel = settings.midiChannel;
+            key->midiVelocity = settings.velocity;
+            key->midiNote = note;
+            key->noteOnSent = MIDI_QueueNoteOn(key->midiChannel, key->midiNote, key->midiVelocity);
+        }
     }
     else if (key->noteOnSent) {
         // NOTE ON was previously sent and key was just depressed -> send NOTE OFF

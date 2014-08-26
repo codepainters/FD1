@@ -14,7 +14,8 @@
 #define KBD_TOTAL_KEYS  (KBD_ROWS * KBD_COLUMNS)
 
 // MIDI note number of the left-most keyboard key
-#define KBD_LEFTMOST_NOTE   (21)
+// (it's -3, because first physical key has index 3 for this kbd)
+#define KBD_LEFTMOST_NOTE   (-3)
 
 // convert row/column to key index, the left-most key has index 0
 #define KBD_KEY_INDEX(row, column)     (KBD_TOTAL_KEYS - ((row) * KBD_COLUMNS + (column)) - 1)
