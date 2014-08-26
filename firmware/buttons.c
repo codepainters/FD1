@@ -5,8 +5,8 @@
 #include "buttons.h"
 #include "buttons_defs.h"
 #include "gpio_pin.h"
-#include "panel.h"
 
+// how long (ticks) the button state has to remain stable
 #define DEBOUNCE_DURATION  (100)
 
 // encoder FSM states
@@ -71,7 +71,7 @@ static void Buttons_HandlePButton()
             pushButton.previousState++;
         }
         else if (pushButton.pressDuration == DEBOUNCE_DURATION)  {
-            Panel_HandleButtonAction(val == 0 ? ACTION_PBUTTON_PRESS : ACTION_PBUTTON_RELEASE);
+            Buttons_ButtonEventCallback(val == 0 ? BUTTON_EVENT_PB_PRESSED : BUTTON_EVENT_PB_RELEASED);
             pushButton.previousState++;
         }
     }
@@ -94,9 +94,9 @@ static void Buttons_HandleEncoder()
 
     // note: encoderDelta is basically the last tick, it is zero'ed after reading
     if (nextState & ENC_EMIT_CW) {
-        Panel_HandleButtonAction(ACTION_ENCODER_CW);
+        Buttons_ButtonEventCallback(BUTTON_EVENT_ENCODER_CW);
     }
     else if (nextState & ENC_EMIT_CCW) {
-        Panel_HandleButtonAction(ACTION_ENCODER_CCW);
+        Buttons_ButtonEventCallback(BUTTON_EVENT_ENCODER_CCW);
     }
 }

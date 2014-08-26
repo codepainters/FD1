@@ -10,11 +10,11 @@ typedef enum {
     _EDIT_MODE_COUNT
 } EditMode_t;
 
-static EditMode_t editMode = EDIT_CHANNEL;
-
-
 static void Panel_EditValue(int delta);
 static void Panel_UpdateDisplay();
+static int Panel_AdjustValue(int value, int delta, int min, int max);
+
+static EditMode_t editMode = EDIT_CHANNEL;
 
 void Panel_Init()
 {
@@ -22,18 +22,18 @@ void Panel_Init()
     Buttons_Init();
 }
 
-void Panel_HandleButtonAction(PanelButtonAction_t action)
+void Buttons_ButtonEventCallback(ButtonAction_t action)
 {
     switch(action) {
-    case ACTION_PBUTTON_PRESS:
+    case BUTTON_EVENT_PB_PRESSED:
         editMode = (editMode + 1) % _EDIT_MODE_COUNT;
         break;
 
-    case ACTION_ENCODER_CW:
+    case BUTTON_EVENT_ENCODER_CW:
         Panel_EditValue(1);
         break;
 
-    case ACTION_ENCODER_CCW:
+    case BUTTON_EVENT_ENCODER_CCW:
         Panel_EditValue(-1);
         break;
 
@@ -48,20 +48,32 @@ static void Panel_EditValue(int delta)
 {
     switch(editMode) {
     case EDIT_CHANNEL:
-        settings.midiChannel += delta;
+        settings.midiChannel = Panel_AdjustValue(settings.midiChannel, delta, MIDI_CHANNEL_MIN, MIDI_CHANNEL_MAX);
         break;
 
     case EDIT_VELOCITY:
-        settings.velocity += delta;
+        settings.velocity += Panel_AdjustValue(settings.velocity, delta, MIDI_VELOCITY_MIN, MIDI_VELOCITY_MAX);
         break;
 
     case EDIT_OCTAVE:
-        settings.octave += delta;
+        settings.octave += Panel_AdjustValue(settings.octave, delta, OCTAVE_SHIFT_MIN, OCTAVE_SHIFT_MAX);;
         break;
 
     default:
         break;
     }
+}
+
+static int Panel_AdjustValue(int value, int delta, int min, int max)
+{
+    value += delta;
+    if (value < min) {
+        return min;
+    }
+    else if (value > max) {
+        return max;
+    }
+    return value;
 }
 
 static void Panel_UpdateDisplay()
