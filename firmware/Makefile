@@ -30,7 +30,8 @@ OBJS += $(LPC1XXX_PATH)/LPC13xx_handlers.o $(LPC1XXX_PATH)/LPC1xxx_startup.o
 # GNU GCC toolkit settings
 # ------------------------------------------------------------------------
 
-CROSS_COMPILE = arm-none-eabi-
+ARM_TOOLKIT_PATH ?=
+CROSS_COMPILE = $(TOOLKIT_PATH)arm-none-eabi-
 AS = $(CROSS_COMPILE)gcc
 CC = $(CROSS_COMPILE)gcc
 LD = $(CROSS_COMPILE)gcc
