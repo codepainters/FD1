@@ -20,6 +20,13 @@ void Panel_Init()
 {
     Display_Init();
     Buttons_Init();
+
+    Panel_UpdateDisplay();
+}
+
+void Panel_TimerTick()
+{
+    Display_TimerTick();
 }
 
 void Buttons_ButtonEventCallback(ButtonAction_t action)

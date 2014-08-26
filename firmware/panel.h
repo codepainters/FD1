@@ -3,4 +3,6 @@
 
 void Panel_Init();
 
+void Panel_TimerTick();
+
 #endif // __PANEL_H__

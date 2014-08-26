@@ -68,11 +68,11 @@ static void Buttons_HandlePButton()
     // debouncing logic
     if (val == pushButton.previousState) {
         if (pushButton.pressDuration < DEBOUNCE_DURATION) {
-            pushButton.previousState++;
+            pushButton.pressDuration++;
         }
         else if (pushButton.pressDuration == DEBOUNCE_DURATION)  {
             Buttons_ButtonEventCallback(val == 0 ? BUTTON_EVENT_PB_PRESSED : BUTTON_EVENT_PB_RELEASED);
-            pushButton.previousState++;
+            pushButton.pressDuration++;
         }
     }
     else {
