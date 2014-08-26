@@ -28,7 +28,7 @@ static EncoderState_t encoderFsm[][4] = {
     [ENC_CCW_NEXT] =	{ ENC_CCW_NEXT, ENC_CCW_FINAL, ENC_CCW_BEGIN, ENC_START }
 };
 
-static EncoderState_t encoderState;
+static EncoderState_t encoderState = ENC_START;
 
 typedef struct {
     unsigned int pressDuration;
