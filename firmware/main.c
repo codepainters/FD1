@@ -40,9 +40,8 @@ void TIMER16_0_IRQHandler(void) {
 
     timerCount++;
 
-    //if ((timerCount & 0x0F) == 0) {
-        Display_TimerTick();
-    //}
+    // Note: encoder needs such a high rate (10kHz / 3) to work reliably!
+    Display_TimerTick();
 
     if ((timerCount % 10000) == 0) {
         idx ++;
