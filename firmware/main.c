@@ -41,6 +41,8 @@ void TIMER16_0_IRQHandler(void) {
 
     timerCount++;
 
+    Keyboard_TimerTick();
+
     // Note: encoder needs such a high rate (10kHz / 3) to work reliably!
     Panel_TimerTick();
 
