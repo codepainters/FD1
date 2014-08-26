@@ -9,10 +9,12 @@
  *
  * R0/C0 is the right-most key, R3/C4 is the left-most key.
  */
-
 #define KBD_ROWS        (4)
 #define KBD_COLUMNS     (5)
 #define KBD_TOTAL_KEYS  (KBD_ROWS * KBD_COLUMNS)
+
+// MIDI note number of the left-most keyboard key
+#define KBD_LEFTMOST_NOTE   (21)
 
 // convert row/column to key index, the left-most key has index 0
 #define KBD_KEY_INDEX(row, column)     (KBD_TOTAL_KEYS - ((row) * KBD_COLUMNS + (column)) - 1)
@@ -33,5 +35,7 @@ GpioPin_t KBD_COLUMN_PINS[KBD_COLUMNS] ={
     { &IOCON_PIO2_1, 2, 1, IOCON_PIO2_1_HYS_DISABLE | IOCON_PIO2_1_MODE_PULLUP | IOCON_PIO2_1_FUNC_GPIO }
 };
 
+// debounce period (ticks)
+#define DEBOUNCE_PERIOD (100)
 
 #endif // __KEYBOARD_DEFS_H__

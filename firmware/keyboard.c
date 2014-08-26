@@ -1,16 +1,27 @@
+#include <stdbool.h>
+
 #include "keyboard.h"
 #include "keyboard_defs.h"
-
-// special value used to denote a state when key event was triggered already
-#define DEBOUNCE_IDLE   (-1)
-
-// debounce period (ticks)
-#define DEBOUNCE_PERIOD (100)
+#include "settings.h"
+#include "midi.h"
 
 typedef struct {
+    // debounce counter is initailized with DEBOUNCE_PERIOD and counts down
     int debounceCounter;
+    // previous-tick state of the key (without debouncing)
     int previousState;
+    // true, if key is considered pressed at the moment
     bool pressed;
+
+    // if true, NOTE ON message was sent, and NOTE OFF shall be enqueued
+    // once the key is released
+    bool noteOnSent;
+
+    // MIDI note params for the pressed key
+    unsigned int midiNote;
+    unsigned int midiVelocity;
+    unsigned int midiChannel;
+
 } KeyState_t;
 
 static KeyState_t keys[KBD_TOTAL_KEYS];
@@ -22,7 +33,7 @@ static void Keyboard_HandleKeyAction(unsigned int index);
 void Keyboard_Init()
 {
     for (int i = 0; i < KBD_TOTAL_KEYS; i++) {
-        keys[i].debounceCounter = DEBOUNCE_IDLE;
+        keys[i].debounceCounter = 0;
         keys[i].previousState = 0;
         keys[i].pressed = false;
     }
@@ -76,5 +87,24 @@ void Keyboard_TimerTick()
 
 static void Keyboard_HandleKeyAction(unsigned int index)
 {
+    KeyState_t* key = &keys[index];
+
+    // Note: it is assumed that MIDI OUT is fast enough (~500 notes/s), that
+    // there is no need to control if key's NOTE ON/OFF were sent already when
+    // key press is detected
+
+    if(key->pressed) {
+        // set note parameters
+        key->midiChannel = settings.midiChannel;
+        key->midiVelocity = settings.velocity;
+        key->midiNote = KBD_LEFTMOST_NOTE + (settings.octave * 12) + index;
+
+        key->noteOnSent = MIDI_QueueNoteOn(key->midiChannel, key->midiNote, key->midiVelocity);
+    }
+    else if (key->noteOnSent) {
+        // NOTE ON was previously sent and key was just depressed -> send NOTE OFF
+        MIDI_QueueNoteOff(key->midiChannel, key->midiNote);
+        key->noteOnSent = false;
+    }
 }
 
