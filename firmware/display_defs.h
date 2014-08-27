@@ -9,6 +9,9 @@
 // Note: LEDs act as a special 3rd digit
 #define DISPLAY_DIGITS      (3)
 
+// how many clock cycles to keep DP led ON
+#define DP_BLINK_DURATION   (500)
+
 /*
  * Multiplexed LED display digit pins.
  *
@@ -36,6 +39,9 @@ static const uint8_t SEGMENTS_HEX[] = {
     0x10, 0x90, 0x50, 0x1C, // 8, 9, A, B
     0x39, 0x16, 0x38, 0x78  // C, D, E, F
 };
+
+#define SEGMENTS_DP         (0x10)
+#define SEGMENTS_DP_MASK    (0xEF)
 
 #define SEGMENTS_BLANK (0xFF)
 #define SEGMENTS_DASH  (0xFE)

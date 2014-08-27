@@ -12,6 +12,9 @@ static volatile int digitIdx = 0;
 // current state of each digit's segments
 static volatile int digit[DISPLAY_DIGITS] = { SEGMENTS_BLANK, SEGMENTS_BLANK, SEGMENTS_BLANK };
 
+// time (ticks) until turning DP off
+static volatile unsigned int dpCountdown = 0;
+
 static void Display_SetSegments(uint32_t segments);
 static void Display_SetDigitPin(uint32_t digit, bool active);
 
@@ -28,19 +31,6 @@ void Display_Init()
     for (i = 0; i < sizeof(DISPLAY_DIGIT_PIN) / sizeof(DISPLAY_DIGIT_PIN[0]); i++) {
         GpioPin_ConfigureOut(&DISPLAY_DIGIT_PIN[i], 0);
     }
-}
-
-static void Display_SetSegments(uint32_t segments)
-{
-    uint8_t Dummy = Dummy;
-
-    // Note: TX FIFO should be empty here
-    while ((SSP_SSP0SR & (SSP_SSP0SR_TNF_NOTFULL | SSP_SSP0SR_BSY_BUSY)) != SSP_SSP0SR_TNF_NOTFULL);
-    SSP_SSP0DR = segments;
-
-    // TODO: is there any way to avoid draining RX FIFO? or do it in the background?
-    while ( (SSP_SSP0SR & (SSP_SSP0SR_BSY_BUSY|SSP_SSP0SR_RNE_NOTEMPTY)) != SSP_SSP0SR_RNE_NOTEMPTY );
-    Dummy = SSP_SSP0DR;
 }
 
 void Display_TimerTick()
@@ -70,10 +60,20 @@ void Display_TimerTick()
     // ..and let buttons check the state
     Buttons_CheckState(digitIdx);
 
+    // execute the DP logic
+    if (dpCountdown > 0) {
+        dpCountdown--;
+    }
+
     // now we can prepare for the next digit
     digitIdx = (digitIdx + 1) % DISPLAY_DIGITS;
 
-    Display_SetSegments(digit[digitIdx]);
+    if (digitIdx == 1) {
+        Display_SetSegments(digit[digitIdx] & SEGMENTS_DP_MASK | (dpCountdown ? 0 : SEGMENTS_DP));
+    }
+    else {
+        Display_SetSegments(digit[digitIdx]);
+    }
 }
 
 void Display_SetInt(int aValue)
@@ -114,6 +114,24 @@ void Display_SetLeds(int state)
             (state & Display_LED1 ? SEGMENTS_LED1 : 0x0FF) &
             (state & Display_LED2 ? SEGMENTS_LED2 : 0x0FF) &
             (state & Display_LED3 ? SEGMENTS_LED3 : 0x0FF);
+}
+
+void Display_BlinkDP()
+{
+    dpCountdown = DP_BLINK_DURATION;
+}
+
+static void Display_SetSegments(uint32_t segments)
+{
+    uint8_t Dummy = Dummy;
+
+    // Note: TX FIFO should be empty here
+    while ((SSP_SSP0SR & (SSP_SSP0SR_TNF_NOTFULL | SSP_SSP0SR_BSY_BUSY)) != SSP_SSP0SR_TNF_NOTFULL);
+    SSP_SSP0DR = segments;
+
+    // TODO: is there any way to avoid draining RX FIFO? or do it in the background?
+    while ( (SSP_SSP0SR & (SSP_SSP0SR_BSY_BUSY|SSP_SSP0SR_RNE_NOTEMPTY)) != SSP_SSP0SR_RNE_NOTEMPTY );
+    Dummy = SSP_SSP0DR;
 }
 
 static void Display_SetDigitPin(uint32_t i, bool active)

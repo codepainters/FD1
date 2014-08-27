@@ -32,4 +32,9 @@ void Display_SetHex(int aValue);
  */
 void Display_SetLeds(int state);
 
+/**
+ * Blinks the decmal point (used to show MIDI activity)
+ */
+void Display_BlinkDP();
+
 #endif // __DISPLAY_H__

@@ -1,5 +1,6 @@
 #include "midi.h"
 #include "uart/uart.h"
+#include "display.h"
 
 #define BUFFER_SIZE     (32)
 
@@ -35,6 +36,7 @@ void MIDI_SendQueued()
     // Note: we use the "one slot unused" FIFO variant, and thus don't need to disable
     // interrupts here
     while (fifoRd != fifoWr) {
+        Display_BlinkDP();
         uartSendByte(fifo[fifoRd]);
         fifoRd = (fifoRd + 1) % BUFFER_SIZE;
     }
