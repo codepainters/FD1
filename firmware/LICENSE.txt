@@ -1,3 +1,5 @@
+Software License Agreement (BSD License)
+
 Copyright (c) 2014, Przemysław Węgrzyn <pwegrzyn@codepainters.com>
 All rights reserved.
 
