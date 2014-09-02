@@ -1,3 +1,11 @@
+/**
+ * Copyright (c) 2014, Przemyslaw Wegrzyn <pwegrzyn@codepainters.com>
+ * All rights reserved.
+ *
+ * This file is distributed under the Modified BSD License.
+ * See LICENSE.txt for details.
+ */
+
 #ifndef __DISPLAY_H__
 #define __DISPLAY_H__
 
@@ -9,6 +17,9 @@ enum DisplayLed {
 
 void Display_Init();
 
+/**
+ * Display multiplexing occurs in this call, on each call next digit is displayed.
+ */
 void Display_TimerTick();
 
 /**
