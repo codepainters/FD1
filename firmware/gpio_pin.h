@@ -27,4 +27,14 @@ void GpioPin_ConfigureOut(const GpioPin_t* pin, int initialState);
  */
 void GpioPin_ConfigureIn(const GpioPin_t* pin);
 
+/**
+ * Sets the output pin state
+ */
+inline void GpioPin_SetValue(const GpioPin_t* pin, const uint32_t state);
+
+/**
+ * Returns value of a given input pin
+ */
+inline uint32_t GpioPin_GetValue(const GpioPin_t* pin);
+
 #endif // __PINS_H__
