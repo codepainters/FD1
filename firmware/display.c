@@ -7,7 +7,6 @@
  */
 
 #include "lpc134x.h"
-#include "ssp/ssp.h"
 
 #include "display.h"
 #include "display_defs.h"
@@ -28,11 +27,36 @@ static void Display_SetDigitPin(uint32_t digit, bool active);
 
 void Display_Init()
 {
-    // HC595 shifts on rising clock edge, hence we set clock to be high when idle
-    // and let the transition occur on the falling edge
-    // Note: sspInit() reconfigures PIO0_2!
-    sspInit(0, sspClockPolarity_High, sspClockPhase_FallingEdge);
+    // reset SSP
+    SCB_PRESETCTRL &= ~SCB_PRESETCTRL_SSP0_MASK;
+    SCB_PRESETCTRL |= SCB_PRESETCTRL_SSP0_RESETDISABLED;
 
+    // enable SSP clock, divide by 1
+    SCB_SYSAHBCLKCTRL |= (SCB_SYSAHBCLKCTRL_SSP0);
+    SCB_SSP0CLKDIV = SCB_SSP0CLKDIV_DIV1;
+
+    // configure PIO0.9 as SSP MOSI
+    IOCON_PIO0_9 &= ~IOCON_PIO0_9_FUNC_MASK;
+    IOCON_PIO0_9 |= IOCON_PIO0_9_FUNC_MOSI0;
+
+    // configure PIO2.11 as SSP SCK
+    IOCON_SCKLOC = IOCON_SCKLOC_SCKPIN_PIO2_11;
+    IOCON_PIO2_11 = IOCON_PIO2_11_FUNC_SCK0;
+
+    // configure SSP format
+    SSP_SSP0CR0 = SSP_SSP0CR0_DSS_8BIT |    // 8-bit data
+                  SSP_SSP0CR0_FRF_SPI |     // SPI frame format
+                  SSP_SSP0CR0_SCR_8 |       // Serial clock rate = 8
+                  SSP_SSP0CR0_CPOL_HIGH |   // Clock polarity - high
+                  SSP_SSP0CR0_CPHA_SECOND;  // Clock phase - falling edge
+
+    // clock prescale register
+    SSP_SSP0CPSR = SSP_SSP0CPSR_CPSDVSR_DIV2;
+
+    // enable SSP in master mode, no loopback
+    SSP_SSP0CR1 = SSP_SSP0CR1_SSE_ENABLED | SSP_SSP0CR1_MS_MASTER | SSP_SSP0CR1_LBM_NORMAL;
+
+    // configure HC595 strobe and digit seleciton pins
     GpioPin_ConfigureOut(&HC595_STROBE, 1);
     for (unsigned int i = 0; i < sizeof(DISPLAY_DIGIT_PIN) / sizeof(DISPLAY_DIGIT_PIN[0]); i++) {
         GpioPin_ConfigureOut(&DISPLAY_DIGIT_PIN[i], 0);
