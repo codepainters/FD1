@@ -22,8 +22,8 @@ static volatile int digit[DISPLAY_DIGITS] = { SEGMENTS_BLANK, SEGMENTS_BLANK, SE
 // time (ticks) until turning DP off
 static volatile unsigned int dpCountdown = 0;
 
-static void Display_SetSegments(uint32_t segments);
-static void Display_SetDigitPin(uint32_t digit, bool active);
+static void Display_SetSegments(unsigned int segments);
+static void Display_SetDigitPin(unsigned int digit, bool active);
 
 void Display_Init()
 {
@@ -149,7 +149,7 @@ void Display_BlinkDP()
     dpCountdown = DP_BLINK_DURATION;
 }
 
-static void Display_SetSegments(uint32_t segments)
+static void Display_SetSegments(unsigned int segments)
 {
     uint8_t Dummy = Dummy;
 
@@ -162,7 +162,7 @@ static void Display_SetSegments(uint32_t segments)
     Dummy = SSP_SSP0DR;
 }
 
-static void Display_SetDigitPin(uint32_t i, bool active)
+static void Display_SetDigitPin(unsigned int i, bool active)
 {
     // Note: LPC1343 doesn't support open-drain GPIO mode, unfortunately, so what's done here
     // is a bit of a hack - switching between output mode pulling down and input mode
