@@ -59,7 +59,8 @@ void Display_Init()
     // configure HC595 strobe and digit seleciton pins
     GpioPin_ConfigureOut(&HC595_STROBE, 1);
     for (unsigned int i = 0; i < sizeof(DISPLAY_DIGIT_PIN) / sizeof(DISPLAY_DIGIT_PIN[0]); i++) {
-        GpioPin_ConfigureOut(&DISPLAY_DIGIT_PIN[i], 0);
+        // Note: due to a lil' hack, digit pins are configured as inputs when inactive
+        GpioPin_ConfigureIn(&DISPLAY_DIGIT_PIN[i]);
     }
 }
 
