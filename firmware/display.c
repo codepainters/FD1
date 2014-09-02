@@ -64,6 +64,11 @@ void Display_Init()
     }
 }
 
+unsigned int Display_CurrentDigit()
+{
+    return digitIdx;
+}
+
 void Display_TimerTick()
 {
     // Note: as silly as it sounds, LPC1343 is unable to generate an interrupt at the end
@@ -73,6 +78,8 @@ void Display_TimerTick()
     // For this reason we initiated SPI transfer at the end of the tick, simply assuming it
     // is going to be ready before the next tick
 
+    // let buttons check the state
+    Buttons_CheckState(digitIdx);
 
     // blank all
     for (unsigned int i = 0; i < sizeof(DISPLAY_DIGIT_PIN) / sizeof(DISPLAY_DIGIT_PIN[0]); i++) {
@@ -85,9 +92,6 @@ void Display_TimerTick()
 
     // enable given digit
     Display_SetDigitPin(digitIdx, 1);
-
-    // ..and let buttons check the state
-    Buttons_CheckState(digitIdx);
 
     // execute the DP logic
     if (dpCountdown > 0) {

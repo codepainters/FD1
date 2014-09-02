@@ -1,11 +1,18 @@
+/**
+ * Copyright (c) 2014, Przemyslaw Wegrzyn <pwegrzyn@codepainters.com>
+ * All rights reserved.
+ *
+ * This file is distributed under the Modified BSD License.
+ * See LICENSE.txt for details.
+ */
+
 #ifndef __BUTTONS_DEFS_H__
 #define __BUTTONS_DEFS_H__
 
 #include "gpio_pin.h"
 
-/*
- * Panel buttons
- */
+// how long (ticks) the button state has to remain stable
+#define DEBOUNCE_DURATION  (100)
 
 // Input pins of the front panel matrix, with pull-ups
 GpioPin_t ROW_PINS[] ={
@@ -17,9 +24,11 @@ GpioPin_t ROW_PINS[] ={
         IOCON_JTAG_TDO_PIO1_1_FUNC_GPIO | IOCON_JTAG_TDO_PIO1_1_ADMODE_DIGITAL }
 };
 
+// indexes for ROW_PINS
 #define ROW_PB1         (0)
 #define ROW_PB2         (1)
 
+// indexes for columns
 #define COLUMN_ENCODER  (0)
 #define COLUMN_PBUTTON  (1)
 

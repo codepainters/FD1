@@ -26,6 +26,7 @@ void Panel_Init()
 
 void Panel_TimerTick()
 {
+    Buttons_CheckState(Display_CurrentDigit());
     Display_TimerTick();
 }
 

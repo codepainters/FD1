@@ -18,6 +18,11 @@ enum DisplayLed {
 void Display_Init();
 
 /**
+ * Returns currently selected column, used by the buttons module
+ */
+unsigned int Display_CurrentDigit();
+
+/**
  * Display multiplexing occurs in this call, on each call next digit is displayed.
  */
 void Display_TimerTick();

@@ -1,3 +1,11 @@
+/**
+ * Copyright (c) 2014, Przemyslaw Wegrzyn <pwegrzyn@codepainters.com>
+ * All rights reserved.
+ *
+ * This file is distributed under the Modified BSD License.
+ * See LICENSE.txt for details.
+ */
+
 #ifndef __BUTTONS_H__
 #define __BUTTONS_H__
 
@@ -11,10 +19,7 @@ typedef enum {
 void Buttons_Init();
 
 /**
- * This function is called from the display driver, right after displaying next digit.
- *
- * For the sake of simplicity it's called directly (as opposed to pointer-to-function
- * callback), hence buttons/display circular reference.
+ * Called periodically to check the buttons state and perform denouncing.
  *
  * Note: this is called in the context of the timer interrupt.
  */
