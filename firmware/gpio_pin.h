@@ -1,7 +1,16 @@
-#ifndef __PINS_H__
-#define __PINS_H__
+/**
+ * Copyright (c) 2014, Przemyslaw Wegrzyn <pwegrzyn@codepainters.com>
+ * All rights reserved.
+ *
+ * This file is distributed under the Modified BSD License.
+ * See LICENSE.txt for details.
+ */
 
-#include "gpio/gpio.h"
+#ifndef __GPIO_PINS_H__
+#define __GPIO_PINS_H__
+
+#include "sysdefs.h"
+#include "lpc134x.h"
 
 /**
  * Helper structure wrapping all the info needed to manipulate particular pin.
@@ -12,8 +21,11 @@
 typedef const struct GpioPin_tag {
     /** address od the IOCON register */
     volatile uint32_t* ioconReg;
+    /** PIO port number */
     uint32_t portNum;
+    /** PIO pin number */
     uint32_t pinNum;
+    /** initial value of the IOCON register */
     uint32_t ioconInitVal;
 } GpioPin_t;
 
@@ -28,13 +40,29 @@ void GpioPin_ConfigureOut(const GpioPin_t* pin, int initialState);
 void GpioPin_ConfigureIn(const GpioPin_t* pin);
 
 /**
- * Sets the output pin state
+ * Sets the output pin state (0 or 1)
  */
-inline void GpioPin_SetValue(const GpioPin_t* pin, const uint32_t state);
+INLINE void GpioPin_SetState(const GpioPin_t* pin, const uint32_t state) INLINE_POST;
 
 /**
- * Returns value of a given input pin
+ * Returns current state (0 or 1) of a given input pin
  */
-inline uint32_t GpioPin_GetValue(const GpioPin_t* pin);
+INLINE uint32_t GpioPin_GetState(const GpioPin_t* pin) INLINE_POST;
 
-#endif // __PINS_H__
+/*
+ * Inline functions implementation
+ */
+
+INLINE void GpioPin_SetState(const GpioPin_t* pin, const uint32_t state)
+{
+    (*(pREG32 ((GPIO_GPIO0_BASE + (pin->portNum << 16)) + ((1 << pin->pinNum) << 2)))) =
+            state ? 0xFFF : 0;
+}
+
+INLINE uint32_t GpioPin_GetState(const GpioPin_t* pin)
+{
+    return (*(pREG32 ((GPIO_GPIO0_BASE + (pin->portNum << 16)) + ((1 << pin->pinNum) << 2)))) &
+            (1 << pin->pinNum) ? 1 : 0;
+}
+
+#endif // __GPIO_PINS_H__

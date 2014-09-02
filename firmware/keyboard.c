@@ -1,4 +1,5 @@
 #include <stdbool.h>
+#include "gpio/gpio.h"
 
 #include "keyboard.h"
 #include "keyboard_defs.h"

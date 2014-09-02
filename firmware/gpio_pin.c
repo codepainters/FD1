@@ -1,25 +1,51 @@
+/**
+ * Copyright (c) 2014, Przemyslaw Wegrzyn <pwegrzyn@codepainters.com>
+ * All rights reserved.
+ *
+ * This file is distributed under the Modified BSD License.
+ * See LICENSE.txt for details.
+ */
+
 #include "gpio_pin.h"
+
+static inline REG32* GpioPin_GetDirReg(const GpioPin_t* pin)
+{
+    switch (pin->portNum)
+    {
+      case 0:
+        return &GPIO_GPIO0DIR;
+        break;
+      case 1:
+        return &GPIO_GPIO1DIR;
+        break;
+      case 2:
+        return &GPIO_GPIO2DIR;
+        break;
+      case 3:
+        return &GPIO_GPIO3DIR;
+        break;
+
+      default:
+        return &GPIO_GPIO0DIR;
+        break;
+    }
+}
 
 void GpioPin_ConfigureOut(const GpioPin_t* pin, int initialState)
 {
     *pin->ioconReg = pin->ioconInitVal;
-    gpioSetDir(pin->portNum, pin->pinNum, gpioDirection_Output);
+
+    REG32* gpioDirReg = GpioPin_GetDirReg(pin);
+    *gpioDirReg |= (1 << pin->pinNum);
+
+    GpioPin_SetState(pin, initialState);
 }
 
 void GpioPin_ConfigureIn(const GpioPin_t* pin)
 {
     *pin->ioconReg = pin->ioconInitVal;
-    gpioSetDir(pin->portNum, pin->pinNum, gpioDirection_Input);
+
+    REG32* gpioDirReg = GpioPin_GetDirReg(pin);
+    *gpioDirReg &= ~(1 << pin->pinNum);
 }
 
-inline void GpioPin_SetValue(const GpioPin_t* pin, const uint32_t state)
-{
-    (*(pREG32 ((GPIO_GPIO0_BASE + (pin->portNum << 16)) + ((1 << pin->bitPos) << 2)))) =
-            state ? 0xFFF : 0;
-}
-
-inline uint32_t GpioPin_GetValue(const GpioPin_t* pin)
-{
-    return (*(pREG32 ((GPIO_GPIO0_BASE + (pin->portNum << 16)) + ((1 << pin->pinNum) << 2)))) &
-            (1 << pin->pinNum) ? 1 : 0;
-}
