@@ -46,7 +46,7 @@ IapResult_t FlashIap_WriteSector(const Sector_t* sector, size_t offset, uint8_t*
     // prepare sector
     uint32_t prepareCommand[5] = { 50, sector->number, sector->number };
     __disable_irq();
-    IAPEntry(command, result);
+    IAPEntry(prepareCommand, result);
     __enable_irq();
     if (result[0] != IAP_SUCCESS) {
         return result[0];
@@ -62,6 +62,8 @@ IapResult_t FlashIap_WriteSector(const Sector_t* sector, size_t offset, uint8_t*
 
 IapResult_t FlashIap_Verify(const Sector_t* sector, size_t offset, uint8_t* buffer, size_t bufferSize)
 {
+    uint32_t result[5];
+
     uint32_t command[5] = { 56, (uint32_t) sector->address + offset, (uint32_t) buffer, bufferSize };
     __disable_irq();
     IAPEntry(command, result);
