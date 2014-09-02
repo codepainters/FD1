@@ -6,8 +6,10 @@
  * See LICENSE.txt for details.
  */
 
-#include "midi.h"
 #include "uart/uart.h"
+
+#include "midi.h"
+#include "display.h"
 
 #define BUFFER_SIZE     (32)
 
