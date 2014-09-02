@@ -163,15 +163,13 @@ static void Display_SetSegments(uint32_t segments)
 
 static void Display_SetDigitPin(uint32_t i, bool active)
 {
-    GpioPin_t* pin = &DISPLAY_DIGIT_PIN[i];
-
     // Note: LPC1343 doesn't support open-drain GPIO mode, unfortunately, so what's done here
     // is a bit of a hack - switching between output mode pulling down and input mode
     if (active) {
-        GpioPin_ConfigureOut(pin, 0);
+        GpioPin_ConfigureOut(&DISPLAY_DIGIT_PIN[i], 0);
     }
     else {
-        GpioPin_ConfigureIn(pin);
+        GpioPin_ConfigureIn(&DISPLAY_DIGIT_PIN[i]);
     }
 }
 
