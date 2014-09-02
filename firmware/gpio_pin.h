@@ -6,8 +6,8 @@
  * See LICENSE.txt for details.
  */
 
-#ifndef __GPIO_PINS_H__
-#define __GPIO_PINS_H__
+#ifndef __GPIO_PIN_H__
+#define __GPIO_PIN_H__
 
 #include "sysdefs.h"
 #include "lpc134x.h"
@@ -65,4 +65,4 @@ INLINE uint32_t GpioPin_GetState(const GpioPin_t* pin)
             (1 << pin->pinNum) ? 1 : 0;
 }
 
-#endif // __GPIO_PINS_H__
+#endif // __GPIO_PIN_H__
