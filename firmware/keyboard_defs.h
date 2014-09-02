@@ -1,3 +1,11 @@
+/**
+ * Copyright (c) 2014, Przemyslaw Wegrzyn <pwegrzyn@codepainters.com>
+ * All rights reserved.
+ *
+ * This file is distributed under the Modified BSD License.
+ * See LICENSE.txt for details.
+ */
+
 #ifndef __KEYBOARD_DEFS_H__
 #define __KEYBOARD_DEFS_H__
 
@@ -14,21 +22,21 @@
 #define KBD_TOTAL_KEYS  (KBD_ROWS * KBD_COLUMNS)
 
 // MIDI note number of the left-most keyboard key
-// (it's -3, because first physical key has index 3 for this kbd)
+// (it's -3, because first physical key has index 3 for the particular keyboard used)
 #define KBD_LEFTMOST_NOTE   (-3)
 
 // convert row/column to key index, the left-most key has index 0
 #define KBD_KEY_INDEX(row, column)     (KBD_TOTAL_KEYS - ((row) * KBD_COLUMNS + (column)) - 1)
 
 // Input pins of the front panel matrix, with pull-ups
-GpioPin_t KBD_ROW_PINS[KBD_ROWS] ={
+const GpioPin_t KBD_ROW_PINS[KBD_ROWS] ={
     { &IOCON_PIO3_0, 3, 0, IOCON_PIO3_0_HYS_DISABLE | IOCON_PIO3_0_MODE_INACTIVE | IOCON_PIO3_0_FUNC_GPIO },
     { &IOCON_PIO3_1, 3, 1, IOCON_PIO3_1_HYS_DISABLE | IOCON_PIO3_1_MODE_INACTIVE | IOCON_PIO3_1_FUNC_GPIO },
     { &IOCON_PIO3_2, 3, 2, IOCON_PIO3_2_HYS_DISABLE | IOCON_PIO3_2_MODE_INACTIVE | IOCON_PIO3_2_FUNC_GPIO },
     { &IOCON_PIO3_3, 3, 3, IOCON_PIO3_3_HYS_DISABLE | IOCON_PIO3_3_MODE_INACTIVE | IOCON_PIO3_3_FUNC_GPIO }
 };
 
-GpioPin_t KBD_COLUMN_PINS[KBD_COLUMNS] ={
+const GpioPin_t KBD_COLUMN_PINS[KBD_COLUMNS] ={
     { &IOCON_PIO1_8, 1, 8, IOCON_PIO1_8_HYS_DISABLE | IOCON_PIO1_8_MODE_PULLUP | IOCON_PIO1_8_FUNC_GPIO },
     { &IOCON_PIO0_2, 0, 2, IOCON_PIO0_2_HYS_DISABLE | IOCON_PIO0_2_MODE_PULLUP | IOCON_PIO0_2_FUNC_GPIO },
     { &IOCON_PIO2_7, 2, 7, IOCON_PIO2_7_HYS_DISABLE | IOCON_PIO2_7_MODE_PULLUP | IOCON_PIO2_7_FUNC_GPIO },

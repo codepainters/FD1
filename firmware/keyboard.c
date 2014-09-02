@@ -1,10 +1,19 @@
-#include <stdbool.h>
+/**
+ * Copyright (c) 2014, Przemyslaw Wegrzyn <pwegrzyn@codepainters.com>
+ * All rights reserved.
+ *
+ * This file is distributed under the Modified BSD License.
+ * See LICENSE.txt for details.
+ */
+
+#include "sysdefs.h"
 
 #include "keyboard.h"
 #include "keyboard_defs.h"
 #include "settings.h"
 #include "midi.h"
 
+// per-key state
 typedef struct {
     // debounce counter is initailized with DEBOUNCE_PERIOD and counts down
     int debounceCounter;
@@ -21,11 +30,12 @@ typedef struct {
     unsigned int midiNote;
     unsigned int midiVelocity;
     unsigned int midiChannel;
-
 } KeyState_t;
 
+// key states
 static KeyState_t keys[KBD_TOTAL_KEYS];
 
+// current scan row of the matrix keyboard
 static unsigned int currentScanRow = 0;
 
 static void Keyboard_HandleKeyAction(unsigned int index);
@@ -95,13 +105,10 @@ static void Keyboard_HandleKeyAction(unsigned int index)
 {
     KeyState_t* key = &keys[index];
 
-    // Note: it is assumed that MIDI OUT is fast enough (~500 notes/s), that
-    // there is no need to control if key's NOTE ON/OFF were sent already when
-    // key press is detected
-
     if(key->pressed) {
         int note = KBD_LEFTMOST_NOTE + (settings.octave * 12) + index;
-        if (note >= 0) {
+        // ensure key is not "active" (i.e. no pending NOTE OFF)
+        if (note >= 0 && !key->noteOnSent) {
             // set note parameters
             key->midiChannel = settings.midiChannel;
             key->midiVelocity = settings.velocity;
@@ -115,4 +122,3 @@ static void Keyboard_HandleKeyAction(unsigned int index)
         key->noteOnSent = false;
     }
 }
-
