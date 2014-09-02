@@ -1,3 +1,11 @@
+/**
+ * Copyright (c) 2014, Przemyslaw Wegrzyn <pwegrzyn@codepainters.com>
+ * All rights reserved.
+ *
+ * This file is distributed under the Modified BSD License.
+ * See LICENSE.txt for details.
+ */
+
 #ifndef __DISPLAY_DEFS_H__
 #define __DISPLAY_DEFS_H__
 
@@ -9,11 +17,7 @@
 // how many clock cycles to keep DP led ON
 #define DP_BLINK_DURATION   (500)
 
-/*
- * Multiplexed LED display digit pins.
- *
- * Should be left floating or pulled low (pseudo open-drain).
- */
+// Multiplexed LED display digit pins. Should be left floating or pulled low (pseudo open-drain).
 GpioPin_t DISPLAY_DIGIT_PIN[] ={
     { &IOCON_PIO2_0, 2, 0, IOCON_COMMON_HYS_DISABLE | IOCON_COMMON_MODE_INACTIVE | IOCON_PIO2_0_FUNC_GPIO },
     { &IOCON_PIO2_6, 2, 6, IOCON_COMMON_HYS_DISABLE | IOCON_COMMON_MODE_INACTIVE | IOCON_PIO2_6_FUNC_GPIO },
@@ -21,9 +25,7 @@ GpioPin_t DISPLAY_DIGIT_PIN[] ={
 };
 
 // strobe signal for HC595 register - PIO1.2
-#define HC595_STROBE_PORT     (1)
-#define HC595_STROBE_PIN      (2)
-GpioPin_t HC595_STROBE = { &IOCON_JTAG_nTRST_PIO1_2, HC595_STROBE_PORT, HC595_STROBE_PIN,
+GpioPin_t HC595_STROBE = { &IOCON_JTAG_nTRST_PIO1_2, 1, 2,
                            IOCON_COMMON_HYS_DISABLE | IOCON_COMMON_MODE_INACTIVE | IOCON_JTAG_nTRST_PIO1_2_FUNC_GPIO };
 
 /*
