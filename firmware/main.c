@@ -1,18 +1,19 @@
 #include "cpu/cpu.h"
 #include "timer16/timer16.h"
-#include "gpio/gpio.h"
 #include "lpc134x.h"
 
+#include "gpio_pin.h"
 #include "panel.h"
 #include "keyboard.h"
 #include "midi.h"
 
 volatile int timerCount = 0;
 
-#define DEBUG_PIN 1
+#define USE_DEBUG_PIN 1
 
-#if DEBUG_PIN
-#define SET_DEBUG_PIN(v) do { gpioSetValue(0, 1, (v)); } while(0)
+#if USE_DEBUG_PIN
+static const GpioPin_t DEBUG_PIN = { &IOCON_PIO0_1, 0, 1, IOCON_PIO0_1_FUNC_GPIO | IOCON_PIO0_1_HYS_DISABLE | IOCON_PIO0_1_MODE_INACTIVE };
+#define SET_DEBUG_PIN(v) do { GpioPin_SetState(&DEBUG_PIN, (v)); } while(0)
 #else
 #define SET_DEBUG_PIN(v)
 #endif
@@ -20,9 +21,8 @@ volatile int timerCount = 0;
 int main() {
 	cpuInit();
 
-#if DEBUG_PIN
-    IOCON_PIO0_1 = IOCON_PIO0_1_FUNC_GPIO | IOCON_PIO0_1_HYS_DISABLE | IOCON_PIO0_1_MODE_INACTIVE;
-    gpioSetDir(0, 1, gpioDirection_Output);
+#if USE_DEBUG_PIN
+    GpioPin_ConfigureOut(&DEBUG_PIN, 0);
 #endif
 
     // intiailize sub-modules

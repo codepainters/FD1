@@ -3,9 +3,6 @@
 
 #include "gpio_pin.h"
 
-// FIXME: update LPC1343CodeBase header
-#define IOCON_PIO2_3_FUNC_GPIO  0x00
-
 // Note: LEDs act as a special 3rd digit
 #define DISPLAY_DIGITS      (3)
 

@@ -1,5 +1,4 @@
 #include <stdbool.h>
-#include "gpio/gpio.h"
 
 #include "keyboard.h"
 #include "keyboard_defs.h"
@@ -48,17 +47,17 @@ void Keyboard_Init()
         GpioPin_ConfigureIn(&KBD_COLUMN_PINS[i]);
     }
 
-    gpioSetValue(KBD_ROW_PINS[currentScanRow].portNum, KBD_ROW_PINS[currentScanRow].pinNum, 0);
+    GpioPin_SetState(&KBD_ROW_PINS[currentScanRow], 0);
 }
 
 void Keyboard_TimerTick()
 {
     // Note: column lines needs some time to charge/discharge, thus we can't read it back immediately after
-    // switching the row. On each cycle we read the row preselected on the previous one, thus giving a whole cycle
-    // for the values to settle.s
+    // switching the row. On each cycle we read the row preselected on the previous cycle, thus giving a whole
+    // cycle time for the values to settle.
 
     for (unsigned int column = 0; column < KBD_COLUMNS; column++) {
-        unsigned int state = gpioGetValue(KBD_COLUMN_PINS[column].portNum, KBD_COLUMN_PINS[column].pinNum) ^ 0x01;
+        unsigned int state = GpioPin_GetState(&KBD_COLUMN_PINS[column]) ^ 0x01;
 
         unsigned int index = KBD_KEY_INDEX(currentScanRow, column);
         KeyState_t* key = &keys[index];
@@ -87,9 +86,9 @@ void Keyboard_TimerTick()
     }
 
     // Disable current row and advance to next one
-    gpioSetValue(KBD_ROW_PINS[currentScanRow].portNum, KBD_ROW_PINS[currentScanRow].pinNum, 1);
+    GpioPin_SetState(&KBD_ROW_PINS[currentScanRow], 1);
     currentScanRow = (currentScanRow + 1) % KBD_ROWS;
-    gpioSetValue(KBD_ROW_PINS[currentScanRow].portNum, KBD_ROW_PINS[currentScanRow].pinNum, 0);
+    GpioPin_SetState(&KBD_ROW_PINS[currentScanRow], 0);
 }
 
 static void Keyboard_HandleKeyAction(unsigned int index)

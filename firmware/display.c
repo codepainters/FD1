@@ -69,7 +69,7 @@ void Display_TimerTick()
     digitIdx = (digitIdx + 1) % DISPLAY_DIGITS;
 
     if (digitIdx == 1) {
-        Display_SetSegments(digit[digitIdx] & SEGMENTS_DP_MASK | (dpCountdown ? 0 : SEGMENTS_DP));
+        Display_SetSegments((digit[digitIdx] & SEGMENTS_DP_MASK) | (dpCountdown ? 0 : SEGMENTS_DP));
     }
     else {
         Display_SetSegments(digit[digitIdx]);
