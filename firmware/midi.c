@@ -8,7 +8,6 @@
 
 #include "midi.h"
 #include "uart/uart.h"
-#include "display.h"
 
 #define BUFFER_SIZE     (32)
 
