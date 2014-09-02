@@ -20,12 +20,33 @@ typedef enum {
     IAP_SUCCESS = 0
 } IapResult_t;
 
+/**
+ * Erase a single Flash sector
+ *
+ * This call issues both prepare (0x50) and erase (0x52) commands.
+ */
 IapResult_t FlashIap_EraseSector(const Sector_t* sector);
 
-IapResult_t FlashIap_PrepareSector(const Sector_t* sector);
+/**
+ * Writes a given buffer into the Flash (includes preparing)
+ *
+ * @param sector        sector to write to
+ * @param offset        offset from the start of the sector, must be a 256 multiply
+ * @param buffer        source buffer
+ * @param bufferSize    buffer size, must be 256, 512, 1024 or 4096
+ * @return status code
+ */
+IapResult_t FlashIap_WriteSector(const Sector_t* sector, size_t offset, uint8_t* buffer, size_t bufferSize);
 
-IapResult_t FlashIap_WriteSector(const Sector_t* sector, uint8_t* buffer, size_t bufferSize);
-
-IapResult_t FlashIap_VerifySector(const Sector_t* sector, uint8_t* buffer, size_t bufferSize);
+/**
+ * Verifies written data
+ *
+ * @param sector        sector to check
+ * @param offset        offset in the sector (word boundry)
+ * @param buffer        buffer to verify against (word boundry)
+ * @param bufferSize    size of the chunk to verify (multiple of 4)
+ * @return
+ */
+IapResult_t FlashIap_Verify(const Sector_t* sector, size_t offset, uint8_t* buffer, size_t bufferSize);
 
 #endif // __FLASH_IAP_H__
