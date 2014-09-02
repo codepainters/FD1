@@ -1,3 +1,11 @@
+/**
+ * Copyright (c) 2014, Przemyslaw Wegrzyn <pwegrzyn@codepainters.com>
+ * All rights reserved.
+ *
+ * This file is distributed under the Modified BSD License.
+ * See LICENSE.txt for details.
+ */
+
 #include "midi.h"
 #include "uart/uart.h"
 #include "display.h"
@@ -61,4 +69,3 @@ static inline void MIDI_QueueByte(uint8_t b)
     fifo[fifoWr] = b;
     fifoWr = (fifoWr + 1) % BUFFER_SIZE;
 }
-
