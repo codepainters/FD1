@@ -1,7 +1,4 @@
 
-#include "gpio/gpio.h"
-#include "lpc134x.h"
-
 #include "buttons.h"
 #include "buttons_defs.h"
 #include "gpio_pin.h"
@@ -63,7 +60,7 @@ void Buttons_CheckState(int column)
 
 static void Buttons_HandlePButton()
 {
-    uint32_t val = gpioGetValue(ROW_PINS[ROW_PB2].portNum, ROW_PINS[ROW_PB2].pinNum);
+    uint32_t val = GpioPin_GetState(&ROW_PINS[ROW_PB2]);
 
     // debouncing logic
     if (val == pushButton.previousState) {
@@ -85,9 +82,7 @@ static void Buttons_HandlePButton()
 static void Buttons_HandleEncoder()
 {
     // Pin 1 & 2 are 0 when encoder is idle
-    uint32_t pin1 = gpioGetValue(ROW_PINS[ROW_PB1].portNum, ROW_PINS[ROW_PB1].pinNum);
-    uint32_t pin2 = gpioGetValue(ROW_PINS[ROW_PB2].portNum, ROW_PINS[ROW_PB2].pinNum);
-    uint32_t inputs = (pin2 << 1) | pin1;
+    uint32_t inputs = (GpioPin_GetState(&ROW_PINS[ROW_PB2]) << 1) | GpioPin_GetState(&ROW_PINS[ROW_PB1]);
 
     // make the FSM transition (note that we need to mask the ENC_EMIT_xxx flags)
     int nextState = encoderFsm[encoderState][inputs];
