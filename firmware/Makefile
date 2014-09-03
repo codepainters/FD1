@@ -5,8 +5,11 @@
 # ------------------------------------------------------------------------
 
 INCLUDE_PATHS = -I. 
-OBJS = main.o display.o buttons.o gpio_pin.o settings.o \
-       panel.o keyboard.o midi.o flash_iap.o
+OBJS = $(addprefix objs/,main.o display.o buttons.o gpio_pin.o \
+	   settings.o panel.o keyboard.o midi.o flash_iap.o)
+
+vpath %.c	src
+vpath %.h	src
 
 # ------------------------------------------------------------------------
 # Files from LPC1343CodeBase library
@@ -20,7 +23,6 @@ OBJS += $(CB_CORE)/cpu/cpu.o \
 		$(CB_CORE)/gpio/gpio.o \
 		$(CB_CORE)/uart/uart.o \
 		$(CB_CORE)/uart/uart_buf.o \
-		$(CB_CORE)/ssp/ssp.o \
 		$(CB_CORE)/timer16/timer16.o
 
 LPC1XXX_PATH = $(CODEBASE)/lpc1xxx
@@ -61,6 +63,14 @@ OCFLAGS = --strip-unneeded
 all: firmware
 
 %.o : %.c
+	$(CC) $(CFLAGS) -o $@ $<
+
+$(OBJS): | objs
+
+objs:
+	mkdir -p objs
+
+objs/%.o : %.c 
 	$(CC) $(CFLAGS) -o $@ $<
 
 %.o : %.s
