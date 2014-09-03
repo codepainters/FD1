@@ -13,8 +13,9 @@
 #include "buttons.h"
 #include "gpio_pin.h"
 
-// index of the currently displayed digit
+// indices of the current and next displayed digit
 static volatile int digitIdx = 0;
+static volatile int nextDigitIdx = 1;
 
 // current state of each digit's segments
 static volatile int digit[DISPLAY_DIGITS] = { SEGMENTS_BLANK, SEGMENTS_BLANK, SEGMENTS_BLANK };
@@ -76,10 +77,14 @@ void Display_TimerTick()
     // See e.g. http://www.lpcware.com/content/forum/interrupt-driven-spi
     //
     // For this reason we initiated SPI transfer at the end of the tick, simply assuming it
-    // is going to be ready before the next tick
+    // is going to be ready before the next tick.
 
-    // let buttons check the state
-    Buttons_CheckState(digitIdx);
+    // At this point digitIdx-th digit is the currently displayed one,
+    // HC595 is preloaded with segments for the next one
+
+    // advance to the next digit
+    digitIdx = nextDigitIdx;
+    nextDigitIdx = (digitIdx + 1) % DISPLAY_DIGITS;
 
     // blank all
     for (unsigned int i = 0; i < sizeof(DISPLAY_DIGIT_PIN) / sizeof(DISPLAY_DIGIT_PIN[0]); i++) {
@@ -99,12 +104,11 @@ void Display_TimerTick()
     }
 
     // now we can prepare for the next digit
-    digitIdx = (digitIdx + 1) % DISPLAY_DIGITS;
-    if (digitIdx == 1) {
-        Display_SetSegments((digit[digitIdx] & SEGMENTS_DP_MASK) | (dpCountdown ? 0 : SEGMENTS_DP));
+    if (nextDigitIdx == 1) {
+        Display_SetSegments((digit[nextDigitIdx] & SEGMENTS_DP_MASK) | (dpCountdown ? 0 : SEGMENTS_DP));
     }
     else {
-        Display_SetSegments(digit[digitIdx]);
+        Display_SetSegments(digit[nextDigitIdx]);
     }
 }
 
