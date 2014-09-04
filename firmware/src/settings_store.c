@@ -225,7 +225,7 @@ static unsigned int SettingsStore_InitSettingsFromSector(const Sector_t* sector)
     unsigned int firstEmptySlot = RECORDS_PER_SECTOR;
 
     // iterate from the end, looking for first valid sector
-    for (unsigned int i = RECORDS_PER_SECTOR - 1; i >= 0; i--) {
+    for (int i = RECORDS_PER_SECTOR - 1; i >= 0; i--) {
 
         // at the same time we look for the first empty record
         if(records[i].flags == RECORD_EMPTY) {
