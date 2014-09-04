@@ -270,7 +270,7 @@ static bool SettingsStore_SetSectorFlags(const Sector_t* sector, const uint32_t 
     if (FlashIap_WriteSector(sector, 0, buffer, sizeof(buffer)) != IAP_SUCCESS) {
         return false;
     }
-    if(FlashIap_Verify(sector, 0, buffer, sizeof(SectorHeader_t) != IAP_SUCCESS)) {
+    if(FlashIap_Verify(sector, 0, buffer, sizeof(SectorHeader_t)) != IAP_SUCCESS) {
         return false;
     }
 
