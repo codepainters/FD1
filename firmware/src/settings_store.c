@@ -10,6 +10,10 @@
 #include "settings.h"
 #include "flash_iap.h"
 
+/*
+ * Types
+ */
+
 // Each sector starts with a header like this, used to store the status.
 // A 16-bytes flash chunk can be written only once, hence the structure.
 typedef struct {
@@ -32,6 +36,10 @@ typedef struct {
     uint8_t octave;
     uint8_t velocity;
 } __attribute__ ((__packed__)) SettingsRecord_t;
+
+/*
+ * Macros, constants, variables
+ */
 
 #define RECORD_EMPTY    (0xFF)
 #define RECORD_USED     (0xAA)
@@ -62,9 +70,16 @@ typedef struct {
 // returns status flags for a secotor with a given index
 #define SECTOR_FLAGS_N(sector_num)  SECTOR_FLAGS(&sectors[(sector_num)])
 
-// Flash sectors used for settings storage
-static Sector_t sectors[NUM_SECTORS] = {
-    // FIXME
+// precalculated record size rounded up to paragraph multiple
+static const unsigned int recordSize = ROUND_UP_16(sizeof(SettingsRecord_t));
+
+// number of records that can be stored per sector
+static const unsigned int recordsPerSector = (SECTOR_SIZE - sizeof(SectorHeader_t)) / ROUND_UP_16(sizeof(SettingsRecord_t));
+
+// Flash sectors used for settings storage, actual space is reserved by the linker script
+static const Sector_t sectors[NUM_SECTORS] = {
+    { (uint8_t*) 0x7000, 7 },
+    { (uint8_t*) 0x8000, 8 }
 };
 
 // current valid sector
@@ -73,20 +88,25 @@ static unsigned int currentSector;
 // offset of the first empty slot in the current sector
 static unsigned int firstEmptySlot;
 
-// precalculated record size rounded up to paragraph multiple
-static const unsigned int recordSize = ROUND_UP_16(sizeof(SettingsRecord_t));
+/*
+ * Forward declarations
+ */
 
 static uint8_t SettingsStore_CalcChecksum(const SettingsRecord_t* record);
 
 static bool SettingsStore_IsRecordValid(const SettingsRecord_t* record);
 
-static unsigned int SettingsStore_InitSettingsFromSector(const int sector);
+static unsigned int SettingsStore_InitSettingsFromSector(const Sector_t* sector);
 
 static bool SettingsStore_SetSectorFlags(const Sector_t* sector, const uint32_t flags);
 
 static bool SettingsStore_WriteSettingsAtSlot(const Sector_t* sector, const unsigned int slot);
 
 static bool SettingsStore_SwapSectors(const Sector_t* from, const Sector_t* to);
+
+/*
+ * Public functions
+ */
 
 void SettingsStore_Init()
 {
@@ -128,8 +148,30 @@ void SettingsStore_Init()
     }
 
     // sectors prepared, now we can fetch latest record from the "active" sector
-    firstEmptySlot = SettingsStore_InitSettingsFromSector(currentSector);
+    firstEmptySlot = SettingsStore_InitSettingsFromSector(&sectors[currentSector]);
 }
+
+void SettingsStore_Save()
+{
+    if (firstEmptySlot >= recordsPerSector) {
+        // No space anymore in the current sector, do the swap
+        unsigned int otherSector = OTHER_SECTOR(currentSector);
+
+        // Note: if it fails, we don't switch the sectors - not much more we can do
+        if (SettingsStore_SwapSectors(&sectors[currentSector], &sectors[otherSector])) {
+            currentSector = otherSector;
+        }
+    }
+    else {
+        if(SettingsStore_WriteSettingsAtSlot(&sectors[currentSector], firstEmptySlot)) {
+            firstEmptySlot++;
+        }
+    }
+}
+
+/*
+ * Internal functions
+ */
 
 /**
  * Calculates XOR checksum over a given settings record
@@ -171,17 +213,19 @@ static bool SettingsStore_IsRecordValid(const SettingsRecord_t* record)
     return true;
 }
 
-static unsigned int SettingsStore_InitSettingsFromSector(const int sector)
+/**
+ * Initialize global settings from a given sector
+ *
+ * @return index of the first empty slot in a given sector
+ */
+static unsigned int SettingsStore_InitSettingsFromSector(const Sector_t* sector)
 {
-    // records must be padded to 16 bytes mutiple
-    unsigned int recordsPerSector = (SECTOR_SIZE - sizeof(SectorHeader_t)) / recordSize;
-
-    SettingsRecord_t* records = (SettingsRecord_t*)(sectors[sector].address + sizeof(SectorHeader_t));
+    const SettingsRecord_t* records = (SettingsRecord_t*)(sector->address + sizeof(SectorHeader_t));
 
     unsigned int firstEmptySlot = recordsPerSector;
 
     // iterate from the end, looking for first valid sector
-    for (int i = recordsPerSector - 1; i >= 0; i--) {
+    for (unsigned int i = recordsPerSector - 1; i >= 0; i--) {
 
         // at the same time we look for the first empty record
         if(records[i].flags == RECORD_EMPTY) {
@@ -191,6 +235,8 @@ static unsigned int SettingsStore_InitSettingsFromSector(const int sector)
             settings.midiChannel = records[i].midiChannel;
             settings.octave = records[i].octave;
             settings.velocity = records[i].velocity;
+
+            break;
         }
     }
 
