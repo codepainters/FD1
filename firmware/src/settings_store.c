@@ -78,8 +78,8 @@ typedef struct {
 
 // Flash sectors used for settings storage, actual space is reserved by the linker script
 static const Sector_t sectors[NUM_SECTORS] = {
-    { (uint8_t*) 0x7000, 7 },
-    { (uint8_t*) 0x8000, 8 }
+    { (uint8_t*) 0x6000, 6 },
+    { (uint8_t*) 0x7000, 7 }
 };
 
 // current valid sector
