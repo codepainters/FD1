@@ -145,6 +145,7 @@ void SettingsStore_Init()
     else {
         // both empty, just use the first one
         currentSector = 0;
+        SettingsStore_SetSectorFlags(&sectors[currentSector], FLAGS_USED);
     }
 
     // sectors prepared, now we can fetch latest record from the "active" sector
