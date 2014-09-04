@@ -20,6 +20,12 @@ typedef enum {
     IAP_SUCCESS = 0
 } IapResult_t;
 
+// size fo single Flash sector in bytes
+#define SECTOR_SIZE     (4096)
+
+// size of a Flash page size (smallest size of a single write operation)
+#define PAGE_SIZE       (256)
+
 /**
  * Erase a single Flash sector
  *
