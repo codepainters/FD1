@@ -35,6 +35,9 @@ typedef struct {
     uint8_t midiChannel;
     uint8_t octave;
     uint8_t velocity;
+
+    // padding to multiple of 4
+    uint8_t _padding[3];
 } __attribute__ ((__packed__)) SettingsRecord_t;
 
 /*
