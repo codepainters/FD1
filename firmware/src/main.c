@@ -28,6 +28,8 @@ int main() {
 
     SettingsStore_Init();
 
+    volatile void*x = SettingsStore_Save;
+
     // intiailize sub-modules
     MIDI_Init();
     Panel_Init();

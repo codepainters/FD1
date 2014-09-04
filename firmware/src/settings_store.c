@@ -70,11 +70,11 @@ typedef struct {
 // returns status flags for a secotor with a given index
 #define SECTOR_FLAGS_N(sector_num)  SECTOR_FLAGS(&sectors[(sector_num)])
 
-// precalculated record size rounded up to paragraph multiple
-static const unsigned int recordSize = ROUND_UP_16(sizeof(SettingsRecord_t));
+// size of a single record rounded up to paragraph multiple
+#define RECORD_SIZE         (ROUND_UP_16(sizeof(SettingsRecord_t)))
 
 // number of records that can be stored per sector
-static const unsigned int recordsPerSector = (SECTOR_SIZE - sizeof(SectorHeader_t)) / ROUND_UP_16(sizeof(SettingsRecord_t));
+#define RECORDS_PER_SECTOR  ((SECTOR_SIZE - sizeof(SectorHeader_t)) / RECORD_SIZE)
 
 // Flash sectors used for settings storage, actual space is reserved by the linker script
 static const Sector_t sectors[NUM_SECTORS] = {
@@ -153,7 +153,7 @@ void SettingsStore_Init()
 
 void SettingsStore_Save()
 {
-    if (firstEmptySlot >= recordsPerSector) {
+    if (firstEmptySlot >= RECORDS_PER_SECTOR) {
         // No space anymore in the current sector, do the swap
         unsigned int otherSector = OTHER_SECTOR(currentSector);
 
@@ -222,10 +222,10 @@ static unsigned int SettingsStore_InitSettingsFromSector(const Sector_t* sector)
 {
     const SettingsRecord_t* records = (SettingsRecord_t*)(sector->address + sizeof(SectorHeader_t));
 
-    unsigned int firstEmptySlot = recordsPerSector;
+    unsigned int firstEmptySlot = RECORDS_PER_SECTOR;
 
     // iterate from the end, looking for first valid sector
-    for (unsigned int i = recordsPerSector - 1; i >= 0; i--) {
+    for (unsigned int i = RECORDS_PER_SECTOR - 1; i >= 0; i--) {
 
         // at the same time we look for the first empty record
         if(records[i].flags == RECORD_EMPTY) {
@@ -289,7 +289,7 @@ static bool SettingsStore_WriteSettingsAtSlot(const Sector_t* sector, const unsi
     }
 
     // offset in the sector where this record shall be written
-    const unsigned int sectorOffset = sizeof(SectorHeader_t) + (recordSize * slot);
+    const unsigned int sectorOffset = sizeof(SectorHeader_t) + (RECORD_SIZE * slot);
     const unsigned int offsetInPage = sectorOffset % PAGE_SIZE;
     const unsigned int pageStart = sectorOffset - offsetInPage;
 
