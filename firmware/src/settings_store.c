@@ -256,7 +256,7 @@ static unsigned int SettingsStore_InitSettingsFromSector(const Sector_t* sector)
 static bool SettingsStore_SetSectorFlags(const Sector_t* sector, const uint32_t flags)
 {
     uint8_t buffer[PAGE_SIZE];
-    for (unsigned int i = 0; i < sizeof(buffer); buffer[i] = 0) {
+    for (unsigned int i = 0; i < sizeof(buffer); i++) {
         buffer[i] = 0xFF;
     }
 
@@ -285,7 +285,7 @@ static bool SettingsStore_WriteSettingsAtSlot(const Sector_t* sector, const unsi
 {
     // note: PAGE_SIZE bytes is a minimum write request size
     uint8_t pageBuffer[PAGE_SIZE];
-    for (unsigned int i = 0; i < sizeof(pageBuffer); pageBuffer[i] = 0) {
+    for (unsigned int i = 0; i < sizeof(pageBuffer); i++) {
         pageBuffer[i] = 0xFF;
     }
 
