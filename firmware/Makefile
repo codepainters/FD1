@@ -87,4 +87,4 @@ firmware: $(OBJS) $(SYS_OBJS)
 	$(LPCRC) firmware.bin
 
 clean:
-	rm -f $(OBJS) $(LD_TEMP) $(OUTFILE).elf $(OUTFILE).bin $(OUTFILE).hex
+	rm -f $(OBJS) $(LD_TEMP) $(OUTFILE).elf $(OUTFILE).bin $(OUTFILE).hex $(OUTFILE).map
