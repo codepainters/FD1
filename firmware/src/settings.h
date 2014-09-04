@@ -41,6 +41,4 @@ typedef struct Settings_tag {
 
 extern Settings_t settings;
 
-void Settings_Init();
-
 #endif // __SETTINGS_H__

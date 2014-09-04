@@ -6,7 +6,7 @@
 
 INCLUDE_PATHS = -I. 
 OBJS = $(addprefix objs/,main.o display.o buttons.o gpio_pin.o \
-	   settings.o panel.o keyboard.o midi.o flash_iap.o)
+	   settings.o settings_store.o panel.o keyboard.o midi.o flash_iap.o)
 
 vpath %.c	src
 vpath %.h	src
