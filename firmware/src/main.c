@@ -6,6 +6,7 @@
 #include "panel.h"
 #include "keyboard.h"
 #include "midi.h"
+#include "settings_store.h"
 
 volatile int timerCount = 0;
 
@@ -24,6 +25,8 @@ int main() {
 #if USE_DEBUG_PIN
     GpioPin_ConfigureOut(&DEBUG_PIN, 0);
 #endif
+
+    SettingsStore_Init();
 
     // intiailize sub-modules
     MIDI_Init();
