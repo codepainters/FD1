@@ -53,4 +53,11 @@ void Display_SetLeds(int state);
  */
 void Display_BlinkDP();
 
+/**
+ * Blanks/unblanks the display
+ *
+ * Unblanking is done after a delay.
+ */
+void Display_SetBlanked(bool blanked);
+
 #endif // __DISPLAY_H__

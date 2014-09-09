@@ -17,6 +17,9 @@
 // how many clock cycles to keep DP led ON
 #define DP_BLINK_DURATION   (500)
 
+// how many clock cycles to delay unblanking (used for visual confirmation)
+#define DP_UNBLANK_DURATION (1200)
+
 // Multiplexed LED display digit pins. Should be left floating or pulled low (pseudo open-drain).
 GpioPin_t DISPLAY_DIGIT_PIN[] ={
     { &IOCON_PIO2_0, 2, 0, IOCON_COMMON_HYS_DISABLE | IOCON_COMMON_MODE_INACTIVE | IOCON_PIO2_0_FUNC_GPIO },

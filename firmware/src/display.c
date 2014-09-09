@@ -23,6 +23,9 @@ static volatile int digit[DISPLAY_DIGITS] = { SEGMENTS_BLANK, SEGMENTS_BLANK, SE
 // time (ticks) until turning DP off
 static volatile unsigned int dpCountdown = 0;
 
+// time (ticks) until unblanking the display
+static volatile unsigned int unblankCountdown = 0;
+
 static void Display_SetSegments(unsigned int segments);
 static void Display_SetDigitPin(unsigned int digit, bool active);
 
@@ -91,6 +94,11 @@ void Display_TimerTick()
         Display_SetDigitPin(i, 0);
     }
 
+    // blanking logic
+    if (unblankCountdown > 0) {
+        unblankCountdown--;
+    }
+
     // pulse STRB, so shit register is loaded into output register
     GpioPin_SetState(&HC595_STROBE, 0);
     GpioPin_SetState(&HC595_STROBE, 1);
@@ -104,7 +112,10 @@ void Display_TimerTick()
     }
 
     // now we can prepare for the next digit
-    if (nextDigitIdx == 1) {
+    if (unblankCountdown != 0) {
+        Display_SetSegments(SEGMENTS_BLANK);
+    }
+    else if (nextDigitIdx == 1) {
         Display_SetSegments((digit[nextDigitIdx] & SEGMENTS_DP_MASK) | (dpCountdown ? 0 : SEGMENTS_DP));
     }
     else {
@@ -155,6 +166,11 @@ void Display_SetLeds(int state)
 void Display_BlinkDP()
 {
     dpCountdown = DP_BLINK_DURATION;
+}
+
+void Display_SetBlanked(bool blanked)
+{
+    unblankCountdown = blanked ? -1 : DP_UNBLANK_DURATION;
 }
 
 static void Display_SetSegments(unsigned int segments)
