@@ -35,9 +35,6 @@ typedef struct {
     uint8_t midiChannel;
     uint8_t octave;
     uint8_t velocity;
-
-    // padding to multiple of 4
-    uint8_t _padding[3];
 } __attribute__ ((__packed__)) SettingsRecord_t;
 
 /*
@@ -320,8 +317,9 @@ static bool SettingsStore_WriteSettingsAtSlot(const Sector_t* sector, const unsi
         return false;
     }
 
-    // we verify only the chunk written
-    if (FlashIap_Verify(sector, sectorOffset, (uint8_t*) record, sizeof(SettingsRecord_t)) != IAP_SUCCESS) {
+    // we verify only the chunk written. We can safely round the size up to 16 multiple, both
+    // buffer and Flash should contain FFs there
+    if (FlashIap_Verify(sector, sectorOffset, (uint8_t*) record, ROUND_UP_16(sizeof(SettingsRecord_t))) != IAP_SUCCESS) {
         return false;
     }
 
