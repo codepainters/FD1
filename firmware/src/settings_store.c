@@ -221,21 +221,22 @@ static bool SettingsStore_IsRecordValid(const SettingsRecord_t* record)
  */
 static unsigned int SettingsStore_InitSettingsFromSector(const Sector_t* sector)
 {
-    const SettingsRecord_t* records = (SettingsRecord_t*)(sector->address + sizeof(SectorHeader_t));
-
     unsigned int firstEmptySlot = RECORDS_PER_SECTOR;
 
-    // iterate from the end, looking for first valid sector
+    uint8_t* baseAddress = sector->address + sizeof(SectorHeader_t);
+
+    // start at last record
     for (int i = RECORDS_PER_SECTOR - 1; i >= 0; i--) {
+        const SettingsRecord_t* record = (SettingsRecord_t*)(baseAddress + ROUND_UP_16(sizeof(SettingsRecord_t)) * i);
 
         // at the same time we look for the first empty record
-        if(records[i].flags == RECORD_EMPTY) {
+        if(record->flags == RECORD_EMPTY) {
             firstEmptySlot = i;
         }
-        else if (SettingsStore_IsRecordValid(&records[i])) {
-            settings.midiChannel = records[i].midiChannel;
-            settings.octave = records[i].octave;
-            settings.velocity = records[i].velocity;
+        else if (SettingsStore_IsRecordValid(record)) {
+            settings.midiChannel = record->midiChannel;
+            settings.octave = record->octave;
+            settings.velocity = record->velocity;
 
             break;
         }
