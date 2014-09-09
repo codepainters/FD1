@@ -8,6 +8,7 @@
 
 #include "panel.h"
 #include "settings.h"
+#include "settings_store.h"
 #include "display.h"
 #include "buttons.h"
 
@@ -41,8 +42,14 @@ void Panel_TimerTick()
 void Buttons_ButtonEventCallback(ButtonAction_t action)
 {
     switch(action) {
-    case BUTTON_EVENT_PB_PRESSED:
+    case BUTTON_EVENT_PB_RELEASED:
         editMode = (editMode + 1) % _EDIT_MODE_COUNT;
+        break;
+
+    case BUTTON_EVENT_PB_LONG_PRESSED:
+        Display_SetBlanked(true);
+        SettingsStore_Save();
+        Display_SetBlanked(false);
         break;
 
     case BUTTON_EVENT_ENCODER_CW:
