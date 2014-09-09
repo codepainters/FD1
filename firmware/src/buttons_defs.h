@@ -15,7 +15,7 @@
 #define DEBOUNCE_DURATION  (100)
 
 // how long (ticks) the button must be pressed to emit long press event
-#define LONG_PRESS_DURATION  (1500)
+#define LONG_PRESS_DURATION  (2000)
 
 // Input pins of the front panel matrix, with pull-ups
 GpioPin_t ROW_PINS[] ={
