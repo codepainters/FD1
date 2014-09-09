@@ -39,7 +39,7 @@ typedef struct {
 } ButtonState_t;
 
 // note: we only have a single push button
-ButtonState_t pushButton = {0, 0};
+ButtonState_t pushButton = {LONG_PRESS_DURATION + 1, 1};
 
 static void Buttons_HandlePButton();
 static void Buttons_HandleEncoder();
@@ -70,12 +70,18 @@ static void Buttons_HandlePButton()
 
     // debouncing logic
     if (val == pushButton.previousState) {
-        if (pushButton.pressDuration < DEBOUNCE_DURATION) {
-            pushButton.pressDuration++;
-        }
-        else if (pushButton.pressDuration == DEBOUNCE_DURATION)  {
+
+        if (pushButton.pressDuration == DEBOUNCE_DURATION)  {
             Buttons_ButtonEventCallback(val == 0 ? BUTTON_EVENT_PB_PRESSED : BUTTON_EVENT_PB_RELEASED);
-            // this ensure event is emitted only once
+        }
+        else if (pushButton.pressDuration == LONG_PRESS_DURATION)  {
+            Buttons_ButtonEventCallback(BUTTON_EVENT_PB_LONG_PRESSED);
+        }
+
+        // when button is pressed we count up long pess duration
+        // note: we increment to max + 1, so event is emitted only once
+        unsigned int max = (val == 0) ? LONG_PRESS_DURATION : DEBOUNCE_DURATION;
+        if (pushButton.pressDuration <= max) {
             pushButton.pressDuration++;
         }
     }
