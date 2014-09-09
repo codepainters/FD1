@@ -34,12 +34,12 @@ static EncoderState_t encoderState = ENC_START;
 
 // state of individual panel button, used for debouncing
 typedef struct {
-    unsigned int pressDuration;
     unsigned int previousState;
+    unsigned int pressDuration;
 } ButtonState_t;
 
 // note: we only have a single push button
-ButtonState_t pushButton = {LONG_PRESS_DURATION + 1, 1};
+ButtonState_t pushButton = {0, 0};
 
 static void Buttons_HandlePButton();
 static void Buttons_HandleEncoder();
@@ -68,24 +68,24 @@ static void Buttons_HandlePButton()
 {
     uint32_t val = GpioPin_GetState(&ROW_PINS[ROW_PB2]);
 
-    // debouncing logic
-    if (val == pushButton.previousState) {
+    if (val == 0 && pushButton.previousState == 0) {
+        if (pushButton.pressDuration <= LONG_PRESS_DURATION) {
+            pushButton.pressDuration++;
+        }
 
         if (pushButton.pressDuration == DEBOUNCE_DURATION)  {
-            Buttons_ButtonEventCallback(val == 0 ? BUTTON_EVENT_PB_PRESSED : BUTTON_EVENT_PB_RELEASED);
+            Buttons_ButtonEventCallback(BUTTON_EVENT_PB_PRESSED);
         }
         else if (pushButton.pressDuration == LONG_PRESS_DURATION)  {
             Buttons_ButtonEventCallback(BUTTON_EVENT_PB_LONG_PRESSED);
         }
-
-        // when button is pressed we count up long pess duration
-        // note: we increment to max + 1, so event is emitted only once
-        unsigned int max = (val == 0) ? LONG_PRESS_DURATION : DEBOUNCE_DURATION;
-        if (pushButton.pressDuration <= max) {
-            pushButton.pressDuration++;
-        }
     }
-    else {
+    else if (val == 1) {
+        // button was released, emit release event, unless it is a long press
+        if (pushButton.pressDuration >= DEBOUNCE_DURATION &&
+                pushButton.pressDuration < LONG_PRESS_DURATION) {
+            Buttons_ButtonEventCallback(BUTTON_EVENT_PB_RELEASED);
+        }
         pushButton.pressDuration = 0;
     }
 
