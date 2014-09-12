@@ -1,5 +1,4 @@
 #include "cpu/cpu.h"
-#include "timer16/timer16.h"
 #include "lpc134x.h"
 
 #include "gpio_pin.h"
@@ -7,8 +6,6 @@
 #include "keyboard.h"
 #include "midi.h"
 #include "settings_store.h"
-
-volatile int timerCount = 0;
 
 #define USE_DEBUG_PIN 1
 
@@ -19,6 +16,8 @@ static const GpioPin_t DEBUG_PIN = { &IOCON_PIO0_1, 0, 1, IOCON_PIO0_1_FUNC_GPIO
 #define SET_DEBUG_PIN(v)
 #endif
 
+#define TIMER16_CCLK_100US      ((CFG_CPU_CCLK/SCB_SYSAHBCLKDIV) / 10000)
+
 int main() {
 	cpuInit();
 
@@ -28,8 +27,6 @@ int main() {
 
     SettingsStore_Init();
 
-    volatile void*x = SettingsStore_Save;
-
     // intiailize sub-modules
     MIDI_Init();
     Panel_Init();
@@ -38,9 +35,16 @@ int main() {
     // as LPC1343CodeBase SPI driver reconfigures PIO0.2
     Keyboard_Init();
 
-    // configure timer to kick at 10kHz
-    timer16Init(0, TIMER16_CCLK_100US);
-    timer16Enable(0);
+    // enable TMR16B0 clock
+    SCB_SYSAHBCLKCTRL |= SCB_SYSAHBCLKCTRL_CT16B0;
+
+    // configure TMR16B0 to kick at 10kHz
+    TMR_TMR16B0MR0 = TIMER16_CCLK_100US;
+    TMR_TMR16B0MCR = TMR_TMR16B0MCR_MR0_INT_ENABLED | TMR_TMR16B0MCR_MR0_RESET_ENABLED;
+
+    // Enable the TIMER0 interrupt, end eventually enable the timer itself
+    NVIC_EnableIRQ(TIMER_16_0_IRQn);
+    TMR_TMR16B0TCR = TMR_TMR16B0TCR_COUNTERENABLE_ENABLED;
 
     // keyboard and panel handling is performed in the timer interrupt context
     // all we need to do in the main code is to send any pendind MIDI data
