@@ -18,7 +18,11 @@ vpath %.h	src
 LPC1XXX_PATH = lpc1xxx
 
 INCLUDE_PATHS += -I$(LPC1XXX_PATH)
-OBJS += $(LPC1XXX_PATH)/LPC13xx_handlers.o $(LPC1XXX_PATH)/LPC1xxx_startup.o
+OBJS += $(addprefix objs/, $(LPC1XXX_PATH)/LPC13xx_handlers.o \
+						   $(LPC1XXX_PATH)/LPC1xxx_startup.o)
+
+vpath %.c	$(LPC1XXX_PATH)
+vpath %.h	$(LPC1XXX_PATH)
 
 # ------------------------------------------------------------------------
 # GNU GCC toolkit settings
@@ -61,6 +65,7 @@ $(OBJS): | objs
 
 objs:
 	mkdir -p objs
+	mkdir -p objs/$(LPC1XXX_PATH)
 
 objs/%.o : %.c 
 	$(CC) $(CFLAGS) -o $@ $<
