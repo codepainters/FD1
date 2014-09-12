@@ -19,7 +19,7 @@ typedef enum {
     _EDIT_MODE_COUNT
 } EditMode_t;
 
-static void Panel_EditValue(int delta);
+static void Panel_EditValue(const int delta);
 static void Panel_UpdateDisplay();
 static int Panel_AdjustValue(int value, int delta, int min, int max);
 
@@ -67,7 +67,7 @@ void Buttons_ButtonEventCallback(ButtonAction_t action)
     Panel_UpdateDisplay();
 }
 
-static void Panel_EditValue(int delta)
+static void Panel_EditValue(const int delta)
 {
     switch(editMode) {
     case EDIT_CHANNEL:
@@ -121,4 +121,3 @@ static void Panel_UpdateDisplay()
         break;
     }
 }
-
