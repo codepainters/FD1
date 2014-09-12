@@ -16,7 +16,7 @@
  * Helper structure wrapping all the info needed to manipulate particular pin.
  *
  * Thanks to NXP silly idea, it's not enough to know the base address of the port
- * and a pin number - we also need to know the address of IOCON register.
+ * and the pin number - we also need to know the address of IOCON register.
  */
 typedef const struct GpioPin_tag {
     /** address od the IOCON register */
@@ -32,7 +32,7 @@ typedef const struct GpioPin_tag {
 /**
  * Configure a given pin as GPIO output
  */
-void GpioPin_ConfigureOut(const GpioPin_t* pin, int initialState);
+void GpioPin_ConfigureOut(const GpioPin_t* pin, const int initialState);
 
 /**
  * Configure a given pin as GPIO input
@@ -42,24 +42,24 @@ void GpioPin_ConfigureIn(const GpioPin_t* pin);
 /**
  * Sets the output pin state (0 or 1)
  */
-INLINE void GpioPin_SetState(const GpioPin_t* pin, const uint32_t state) INLINE_POST;
+INLINE void GpioPin_SetState(const GpioPin_t* pin, const int state) INLINE_POST;
 
 /**
  * Returns current state (0 or 1) of a given input pin
  */
-INLINE uint32_t GpioPin_GetState(const GpioPin_t* pin) INLINE_POST;
+INLINE int GpioPin_GetState(const GpioPin_t* pin) INLINE_POST;
 
 /*
  * Inline functions implementation
  */
 
-INLINE void GpioPin_SetState(const GpioPin_t* pin, const uint32_t state)
+INLINE void GpioPin_SetState(const GpioPin_t* pin, const int state)
 {
     (*(pREG32 ((GPIO_GPIO0_BASE + (pin->portNum << 16)) + ((1 << pin->pinNum) << 2)))) =
             state ? 0xFFF : 0;
 }
 
-INLINE uint32_t GpioPin_GetState(const GpioPin_t* pin)
+INLINE int GpioPin_GetState(const GpioPin_t* pin)
 {
     return (*(pREG32 ((GPIO_GPIO0_BASE + (pin->portNum << 16)) + ((1 << pin->pinNum) << 2)))) &
             (1 << pin->pinNum) ? 1 : 0;

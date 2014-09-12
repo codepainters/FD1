@@ -26,8 +26,8 @@ static volatile unsigned int dpCountdown = 0;
 // time (ticks) until unblanking the display
 static volatile unsigned int unblankCountdown = 0;
 
-static void Display_SetSegments(unsigned int segments);
-static void Display_SetDigitPin(unsigned int digit, bool active);
+static void Display_SetSegments(const unsigned int segments);
+static void Display_SetDigitPin(const unsigned int digit, const bool active);
 
 void Display_Init()
 {
@@ -36,7 +36,7 @@ void Display_Init()
     SCB_PRESETCTRL |= SCB_PRESETCTRL_SSP0_RESETDISABLED;
 
     // enable SSP clock, divide by 1
-    SCB_SYSAHBCLKCTRL |= (SCB_SYSAHBCLKCTRL_SSP0);
+    SCB_SYSAHBCLKCTRL |= SCB_SYSAHBCLKCTRL_SSP0;
     SCB_SSP0CLKDIV = SCB_SSP0CLKDIV_DIV1;
 
     // configure PIO0.9 as SSP MOSI
@@ -123,12 +123,12 @@ void Display_TimerTick()
     }
 }
 
-void Display_SetInt(int aValue)
+void Display_SetInt(const int aValue)
 {
     // Note: value has to be -19 .. 99
-    int absValue = (aValue < 0) ? -aValue : aValue;
-    int l = absValue % 10;
-    int h = absValue / 10;
+    const int absValue = (aValue < 0) ? -aValue : aValue;
+    const int l = absValue % 10;
+    const int h = absValue / 10;
 
     digit[1] = SEGMENTS_HEX[l];
 
@@ -149,13 +149,13 @@ void Display_SetInt(int aValue)
     }
 }
 
-void Display_SetHex(int aValue)
+void Display_SetHex(const int aValue)
 {
     digit[0] = SEGMENTS_HEX[(aValue >> 4) & 0x0F];
     digit[1] = SEGMENTS_HEX[aValue & 0x0F];
 }
 
-void Display_SetLeds(int state)
+void Display_SetLeds(const int state)
 {
     digit[2] =
             (state & Display_LED1 ? SEGMENTS_LED1 : 0x0FF) &
@@ -168,12 +168,12 @@ void Display_BlinkDP()
     dpCountdown = DP_BLINK_DURATION;
 }
 
-void Display_SetBlanked(bool blanked)
+void Display_SetBlanked(const bool blanked)
 {
     unblankCountdown = blanked ? -1 : DP_UNBLANK_DURATION;
 }
 
-static void Display_SetSegments(unsigned int segments)
+static void Display_SetSegments(const unsigned int segments)
 {
     uint8_t Dummy = Dummy;
 
@@ -181,12 +181,12 @@ static void Display_SetSegments(unsigned int segments)
     while ((SSP_SSP0SR & (SSP_SSP0SR_TNF_NOTFULL | SSP_SSP0SR_BSY_BUSY)) != SSP_SSP0SR_TNF_NOTFULL);
     SSP_SSP0DR = segments;
 
-    // TODO: is there any way to avoid draining RX FIFO? or do it in the background?
+    // drain RX FIFO (it's necessary)
     while ( (SSP_SSP0SR & (SSP_SSP0SR_BSY_BUSY|SSP_SSP0SR_RNE_NOTEMPTY)) != SSP_SSP0SR_RNE_NOTEMPTY );
     Dummy = SSP_SSP0DR;
 }
 
-static void Display_SetDigitPin(unsigned int i, bool active)
+static void Display_SetDigitPin(const unsigned int i, const bool active)
 {
     // Note: LPC1343 doesn't support open-drain GPIO mode, unfortunately, so what's done here
     // is a bit of a hack - switching between output mode pulling down and input mode
@@ -197,4 +197,3 @@ static void Display_SetDigitPin(unsigned int i, bool active)
         GpioPin_ConfigureIn(&DISPLAY_DIGIT_PIN[i]);
     }
 }
-

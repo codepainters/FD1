@@ -19,7 +19,7 @@ typedef enum {
 } EncoderState_t;
 
 // encoder FSM transitions
-static EncoderState_t encoderFsm[][4] = {
+static const EncoderState_t encoderFsm[][4] = {
     /* ENC_START */		{ ENC_START, ENC_CCW_BEGIN, ENC_CW_BEGIN, ENC_START },
     /* ENC_CW_BEGIN */	{ ENC_START, ENC_START, ENC_CW_BEGIN, ENC_CW_NEXT },
     /* ENC_CW_NEXT */	{ ENC_START, ENC_CW_FINAL, ENC_CW_BEGIN, ENC_CW_NEXT },
@@ -39,7 +39,7 @@ typedef struct {
 } ButtonState_t;
 
 // note: we only have a single push button
-ButtonState_t pushButton = {0, 0};
+static ButtonState_t pushButton = {0, 0};
 
 static void Buttons_HandlePButton();
 static void Buttons_HandleEncoder();
@@ -66,7 +66,7 @@ void Buttons_CheckState(int column)
 
 static void Buttons_HandlePButton()
 {
-    uint32_t val = GpioPin_GetState(&ROW_PINS[ROW_PB2]);
+    const uint32_t val = GpioPin_GetState(&ROW_PINS[ROW_PB2]);
 
     if (val == 0 && pushButton.previousState == 0) {
         if (pushButton.pressDuration <= LONG_PRESS_DURATION) {
@@ -95,10 +95,10 @@ static void Buttons_HandlePButton()
 static void Buttons_HandleEncoder()
 {
     // Pin 1 & 2 are 0 when encoder is idle
-    uint32_t inputs = (GpioPin_GetState(&ROW_PINS[ROW_PB2]) << 1) | GpioPin_GetState(&ROW_PINS[ROW_PB1]);
+    const uint32_t inputs = (GpioPin_GetState(&ROW_PINS[ROW_PB2]) << 1) | GpioPin_GetState(&ROW_PINS[ROW_PB1]);
 
     // make the FSM transition (note that we need to mask the ENC_EMIT_xxx flags)
-    int nextState = encoderFsm[encoderState][inputs];
+    const int nextState = encoderFsm[encoderState][inputs];
     encoderState = nextState & 0x0F;
 
     if (nextState & ENC_EMIT_CW) {

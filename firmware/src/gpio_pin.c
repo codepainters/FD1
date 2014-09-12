@@ -31,7 +31,7 @@ static inline REG32* GpioPin_GetDirReg(const GpioPin_t* pin)
     }
 }
 
-void GpioPin_ConfigureOut(const GpioPin_t* pin, int initialState)
+void GpioPin_ConfigureOut(const GpioPin_t* pin, const int initialState)
 {
     *pin->ioconReg = pin->ioconInitVal;
 

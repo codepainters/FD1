@@ -9,6 +9,7 @@
 #include "flash_iap.h"
 #include "lpc134x.h"
 
+// entry point to the IAP code in ROM, see AN11008
 #define IAP_LOCATION    (0x1FFF1FF1)
 
 typedef void (*IAP)(uint32_t[], uint32_t[]);
@@ -39,7 +40,8 @@ IapResult_t FlashIap_EraseSector(const Sector_t*  sector)
     return result[0];
 }
 
-IapResult_t FlashIap_WriteSector(const Sector_t* sector, size_t offset, uint8_t* buffer, size_t bufferSize)
+IapResult_t FlashIap_WriteSector(const Sector_t* sector, const size_t offset,
+                                 const uint8_t* buffer, const size_t bufferSize)
 {
     uint32_t result[5];
 
@@ -60,7 +62,8 @@ IapResult_t FlashIap_WriteSector(const Sector_t* sector, size_t offset, uint8_t*
     return result[0];
 }
 
-IapResult_t FlashIap_Verify(const Sector_t* sector, size_t offset, uint8_t* buffer, size_t bufferSize)
+IapResult_t FlashIap_Verify(const Sector_t* sector, const size_t offset,
+                            const uint8_t* buffer, const size_t bufferSize)
 {
     uint32_t result[5];
 

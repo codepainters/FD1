@@ -32,21 +32,21 @@ void Display_TimerTick();
  *
  * @param aValue    range -19..99
  */
-void Display_SetInt(int aValue);
+void Display_SetInt(const int aValue);
 
 /**
  * Displays a hexadecimal number
  *
  * @param aValue    range 0..255
  */
-void Display_SetHex(int aValue);
+void Display_SetHex(const int aValue);
 
 /**
  * Sets the panel LEDs state
  *
  * @param state     OR-ed Display_LEDn values
  */
-void Display_SetLeds(int state);
+void Display_SetLeds(const int state);
 
 /**
  * Blinks the decmal point (used to show MIDI activity)
@@ -58,6 +58,6 @@ void Display_BlinkDP();
  *
  * Unblanking is done after a delay.
  */
-void Display_SetBlanked(bool blanked);
+void Display_SetBlanked(const bool blanked);
 
 #endif // __DISPLAY_H__

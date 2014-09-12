@@ -38,22 +38,22 @@ static KeyState_t keys[KBD_TOTAL_KEYS];
 // current scan row of the matrix keyboard
 static unsigned int currentScanRow = 0;
 
-static void Keyboard_HandleKeyAction(unsigned int index);
+static void Keyboard_HandleKeyAction(const unsigned int index);
 
 void Keyboard_Init()
 {
-    for (int i = 0; i < KBD_TOTAL_KEYS; i++) {
+    for (unsigned int i = 0; i < KBD_TOTAL_KEYS; i++) {
         keys[i].debounceCounter = 0;
         keys[i].previousState = 0;
         keys[i].pressed = false;
         keys[i].noteOnSent = false;
     }
 
-    for (int i = 0; i < KBD_ROWS; i++) {
+    for (unsigned int i = 0; i < KBD_ROWS; i++) {
         GpioPin_ConfigureOut(&KBD_ROW_PINS[i], 1);
     }
 
-    for (int i = 0; i < KBD_COLUMNS; i++) {
+    for (unsigned int i = 0; i < KBD_COLUMNS; i++) {
         GpioPin_ConfigureIn(&KBD_COLUMN_PINS[i]);
     }
 
@@ -101,7 +101,7 @@ void Keyboard_TimerTick()
     GpioPin_SetState(&KBD_ROW_PINS[currentScanRow], 0);
 }
 
-static void Keyboard_HandleKeyAction(unsigned int index)
+static void Keyboard_HandleKeyAction(const unsigned int index)
 {
     KeyState_t* key = &keys[index];
 

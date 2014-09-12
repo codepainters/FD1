@@ -9,8 +9,9 @@
 #ifndef __KEYBOARD_H__
 #define __KEYBOARD_H__
 
-// Note: keyboard module calls MIDI_QueueNoteOn/Off directly, in the context of
-// Keyboard_TimerTick
+/* Note: keyboard module calls MIDI_QueueNoteOn/Off directly, in the context of
+ * Keyboard_TimerTick.
+ */
 
 void Keyboard_Init();
 

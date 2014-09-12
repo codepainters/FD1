@@ -6,6 +6,10 @@
  * See LICENSE.txt for details.
  */
 
+/* This file defines interface to the Flash In-Application Programming
+ * routines stored in MCU's ROM. For details see applicatio note AN11008.
+ */
+
 #ifndef __FLASH_IAP_H__
 #define __FLASH_IAP_H__
 
@@ -42,7 +46,8 @@ IapResult_t FlashIap_EraseSector(const Sector_t* sector);
  * @param bufferSize    buffer size, must be 256, 512, 1024 or 4096
  * @return status code
  */
-IapResult_t FlashIap_WriteSector(const Sector_t* sector, size_t offset, uint8_t* buffer, size_t bufferSize);
+IapResult_t FlashIap_WriteSector(const Sector_t* sector, const size_t offset,
+                                 const uint8_t* buffer, const size_t bufferSize);
 
 /**
  * Verifies written data
@@ -53,6 +58,7 @@ IapResult_t FlashIap_WriteSector(const Sector_t* sector, size_t offset, uint8_t*
  * @param bufferSize    size of the chunk to verify (multiple of 4)
  * @return
  */
-IapResult_t FlashIap_Verify(const Sector_t* sector, size_t offset, uint8_t* buffer, size_t bufferSize);
+IapResult_t FlashIap_Verify(const Sector_t* sector, const size_t offset,
+                            const uint8_t* buffer, const size_t bufferSize);
 
 #endif // __FLASH_IAP_H__

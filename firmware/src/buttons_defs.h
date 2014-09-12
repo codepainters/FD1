@@ -12,13 +12,13 @@
 #include "gpio_pin.h"
 
 // how long (ticks) the button state has to remain stable
-#define DEBOUNCE_DURATION  (100)
+#define DEBOUNCE_DURATION   (100)
 
 // how long (ticks) the button must be pressed to emit long press event
-#define LONG_PRESS_DURATION  (2000)
+#define LONG_PRESS_DURATION (2000)
 
 // Input pins of the front panel matrix, with pull-ups
-GpioPin_t ROW_PINS[] ={
+const GpioPin_t ROW_PINS[] ={
     { &IOCON_JTAG_TMS_PIO1_0, 1, 0,
         IOCON_JTAG_TMS_PIO1_0_HYS_DISABLE | IOCON_JTAG_TMS_PIO1_0_MODE_PULLUP |
         IOCON_JTAG_TMS_PIO1_0_FUNC_GPIO | IOCON_JTAG_TMS_PIO1_0_ADMODE_DIGITAL },
