@@ -4,7 +4,7 @@
 # Project files
 # ------------------------------------------------------------------------
 
-INCLUDE_PATHS = -I. 
+INCLUDE_PATHS = -Isrc 
 OBJS = $(addprefix objs/,main.o display.o buttons.o gpio_pin.o \
 	   settings.o settings_store.o panel.o keyboard.o midi.o flash_iap.o)
 
