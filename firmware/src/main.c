@@ -18,8 +18,10 @@ static const GpioPin_t DEBUG_PIN = { &IOCON_PIO0_1, 0, 1, IOCON_PIO0_1_FUNC_GPIO
 
 #define TIMER16_CCLK_100US      ((CFG_CPU_CCLK/SCB_SYSAHBCLKDIV) / 10000)
 
+static void cpuSetup();
+
 int main() {
-	cpuInit();
+    cpuSetup();
 
 #if USE_DEBUG_PIN
     GpioPin_ConfigureOut(&DEBUG_PIN, 0);
@@ -73,3 +75,50 @@ void TIMER16_0_IRQHandler(void) {
 
     SET_DEBUG_PIN(0);
 }
+
+static void cpuSetup()
+{
+    uint32_t i;
+
+    // Power up system oscillator
+    SCB_PDRUNCFG &= ~(SCB_PDRUNCFG_SYSOSC_MASK);
+
+    // Setup the crystal input (bypass disabled, 1-20MHz crystal)
+    SCB_SYSOSCCTRL = (SCB_SYSOSCCTRL_BYPASS_DISABLED | SCB_SYSOSCCTRL_FREQRANGE_1TO20MHZ);
+
+    for (i = 0; i < 200; i++) {
+        __asm volatile ("NOP");
+    }
+
+    // external crystal as PLL clock source
+    SCB_PLLCLKSEL = SCB_CLKSEL_SOURCE_MAINOSC;
+    SCB_PLLCLKUEN = SCB_PLLCLKUEN_UPDATE;
+    SCB_PLLCLKUEN = SCB_PLLCLKUEN_DISABLE;
+    SCB_PLLCLKUEN = SCB_PLLCLKUEN_UPDATE;
+
+    // wait until the clock is updated
+    while (!(SCB_PLLCLKUEN & SCB_PLLCLKUEN_UPDATE));
+
+    // set x6 multiplier, FCCO = 2 * 2 * 72 = 288MHz
+    SCB_PLLCTRL = (SCB_PLLCTRL_MSEL_6 | SCB_PLLCTRL_PSEL_2);
+
+    // enable system PLL, wait for lock
+    SCB_PDRUNCFG &= ~(SCB_PDRUNCFG_SYSPLL_MASK);
+    while (!(SCB_PLLSTAT & SCB_PLLSTAT_LOCK));
+
+    // setup main clock to use PLL output
+    SCB_MAINCLKSEL = SCB_MAINCLKSEL_SOURCE_SYSPLLCLKOUT;
+    SCB_MAINCLKUEN = SCB_MAINCLKUEN_UPDATE;
+    SCB_MAINCLKUEN = SCB_MAINCLKUEN_DISABLE;
+    SCB_MAINCLKUEN = SCB_MAINCLKUEN_UPDATE;
+
+    // Wait until the clock is updated
+    while (!(SCB_MAINCLKUEN & SCB_MAINCLKUEN_UPDATE));
+
+    // set system AHB clock - div by 1
+    SCB_SYSAHBCLKDIV = SCB_SYSAHBCLKDIV_DIV1;
+
+    // enabled IOCON clock for GPIO
+    SCB_SYSAHBCLKCTRL |= SCB_SYSAHBCLKCTRL_IOCON;
+}
+

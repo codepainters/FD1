@@ -19,8 +19,6 @@ CODEBASE=LPC1343CodeBase
 CB_CORE=$(CODEBASE)/core/
 
 INCLUDE_PATHS += -I$(CODEBASE) -I$(CODEBASE)/core
-OBJS += $(CB_CORE)/cpu/cpu.o \
-                $(CB_CORE)/gpio/gpio.o
 
 LPC1XXX_PATH = $(CODEBASE)/lpc1xxx
 OBJS += $(LPC1XXX_PATH)/LPC13xx_handlers.o $(LPC1XXX_PATH)/LPC1xxx_startup.o
