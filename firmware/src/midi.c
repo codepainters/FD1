@@ -6,10 +6,10 @@
  * See LICENSE.txt for details.
  */
 
-#include "uart/uart.h"
-
 #include "midi.h"
 #include "display.h"
+
+#include "lpc134x.h"
 
 #define BUFFER_SIZE     (32)
 
@@ -22,12 +22,43 @@ static volatile unsigned int fifoRd = 0;
 #define NOTE_ON     (0x90)
 #define NOTE_OFF    (0x80)
 
+#define UART_CLK_DIV    SCB_UARTCLKDIV_DIV1
+#define BAUDRATE        (31250)
+
 static bool MIDI_QueueNoteMsg(unsigned int msg, unsigned int note, unsigned int velocity);
 static inline void MIDI_QueueByte(uint8_t b);
 
 void MIDI_Init()
 {
-    uartInit(31250);
+    // setup PIO1.7 as TXD
+    IOCON_PIO1_7 &= ~IOCON_PIO1_7_FUNC_MASK;
+    IOCON_PIO1_7 |= IOCON_PIO1_7_FUNC_UART_TXD;
+
+    // enable UART clock (div by 1)
+    SCB_SYSAHBCLKCTRL |= SCB_SYSAHBCLKCTRL_UART;
+    SCB_UARTCLKDIV = UART_CLK_DIV;
+
+    // configure standard 8N1 mode, enable baud rate updating
+    UART_U0LCR = UART_U0LCR_Word_Length_Select_8Chars |
+                 UART_U0LCR_Stop_Bit_Select_1Bits |
+                 UART_U0LCR_Parity_Disabled |
+                 UART_U0LCR_Break_Control_Disabled |
+                 UART_U0LCR_Divisor_Latch_Access_Enabled;
+
+    // setup baudrate
+    uint32_t fDiv = (((CFG_CPU_CCLK * SCB_SYSAHBCLKDIV) / UART_CLK_DIV) / 16) / BAUDRATE;
+    UART_U0DLM = fDiv / 256;
+    UART_U0DLL = fDiv % 256;
+
+    // disable baudrate updates again
+    UART_U0LCR = UART_U0LCR_Word_Length_Select_8Chars |
+                 UART_U0LCR_Stop_Bit_Select_1Bits |
+                 UART_U0LCR_Parity_Disabled |
+                 UART_U0LCR_Break_Control_Disabled |
+                 UART_U0LCR_Divisor_Latch_Access_Disabled;
+
+    // enable and reset the FIFOs
+    UART_U0FCR = UART_U0FCR_FIFO_Enabled | UART_U0FCR_Rx_FIFO_Reset | UART_U0FCR_Tx_FIFO_Reset;
 }
 
 bool MIDI_QueueNoteOn(unsigned int channel, unsigned int note, unsigned int velocity)
@@ -46,7 +77,10 @@ void MIDI_SendQueued()
     // interrupts here
     while (fifoRd != fifoWr) {
         Display_BlinkDP();
-        uartSendByte(fifo[fifoRd]);
+
+        while (!(UART_U0LSR & UART_U0LSR_THRE));
+        UART_U0THR = fifo[fifoRd];
+
         fifoRd = (fifoRd + 1) % BUFFER_SIZE;
     }
 }
