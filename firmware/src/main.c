@@ -64,9 +64,9 @@ int main() {
 
         // Wait For Interrupt
         __asm volatile ("wfi");
-	}
+    }
 
-	return 0;
+    return 0;
 }
 
 void TIMER16_0_IRQHandler(void) {
