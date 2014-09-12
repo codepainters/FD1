@@ -1,4 +1,3 @@
-#include "cpu/cpu.h"
 #include "lpc134x.h"
 
 #include "gpio_pin.h"

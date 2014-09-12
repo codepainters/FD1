@@ -15,12 +15,9 @@ vpath %.h	src
 # Files from LPC1343CodeBase library
 # ------------------------------------------------------------------------
 
-CODEBASE=LPC1343CodeBase
-CB_CORE=$(CODEBASE)/core/
+LPC1XXX_PATH = lpc1xxx
 
-INCLUDE_PATHS += -I$(CODEBASE) -I$(CODEBASE)/core
-
-LPC1XXX_PATH = $(CODEBASE)/lpc1xxx
+INCLUDE_PATHS += -I$(LPC1XXX_PATH)
 OBJS += $(LPC1XXX_PATH)/LPC13xx_handlers.o $(LPC1XXX_PATH)/LPC1xxx_startup.o
 
 # ------------------------------------------------------------------------

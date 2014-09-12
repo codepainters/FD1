@@ -1,3 +1,0 @@
-[submodule "firmware/LPC1343CodeBase"]
-	path = firmware/LPC1343CodeBase
-	url = git@github.com:codepainters/LPC1343CodeBase.git
