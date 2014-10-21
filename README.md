@@ -1,7 +1,7 @@
 FD-1 MIDI Foot Keyboard Controller
 ==================================
 
-FD-1 is camy simple MIDI Foot (organ) Keyboard Controller project, 
+FD-1 is a simple MIDI Foot (organ) Keyboard Controller project, 
 based on LPC1343 Cortex-M3 microcontroller. 
 
 The design features:
@@ -30,4 +30,5 @@ The project repository contains:
 
 Dedicated project page (with prototype pictures) to follow soon.
 
-ALl the project files are licensed under Modified BSD License (see LICENSE.txt).
+All the project files are licensed under Modified BSD License (see LICENSE.txt).
+
