@@ -6,7 +6,7 @@ based on LPC1343 Cortex-M3 microcontroller.
 
 The design features:
 
- * sperate keyboard and controller, connected using HDMI cable 
+ * separate keyboard and controller modules, connected using HDMI cable 
    (the cheapest multi-wire cable available)
 
  * a simple control panel with 7-segment display and rotary encoder, 
@@ -14,7 +14,7 @@ The design features:
    (note: the keyboard used for the project has only a single NO contact per key,
    thus the keyboard can't be dynamic)
 
- * persistent (in Flash) storage of the above settings
+ * persistent storage (in Flash) of the above settings
 
  * USB port, used for firmware flashing only at the moment, there's a plan to 
    include MIDI-over-USB implementation later
