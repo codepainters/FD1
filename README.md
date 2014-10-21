@@ -30,3 +30,4 @@ The project repository contains:
 
 Dedicated project page (with prototype pictures) to follow soon.
 
+ALl the project files are licensed under Modified BSD License (see LICENSE.txt).
