@@ -6,17 +6,17 @@ based on LPC1343 Cortex-M3 microcontroller.
 
 The design features:
 
- * separate keyboard and controller modules, connected using HDMI cable 
+ * separate keyboard and controller modules, connected using an HDMI cable 
    (the cheapest multi-wire cable available)
 
- * a simple control panel with 7-segment display and rotary encoder, 
-   allowing for changing MIDI channel, velocity and octave shift on the fly 
+ * a simple control panel with a 7-segment display and a rotary encoder, 
+   allowing for changing the MIDI channel, velocity and octave shift on the fly 
    (note: the keyboard used for the project has only a single NO contact per key,
    thus the keyboard can't be dynamic)
 
- * persistent storage (in Flash) of the above settings
+ * persistent storage (in Flash) of the settings
 
- * USB port, used for firmware flashing only at the moment, there's a plan to 
+ * USB port, at the moment used for firmware flashing only, there's a plan to 
    include MIDI-over-USB implementation later
 
  * switching-mode voltage regulator - controller can be powered from 6-12V DC 
@@ -28,7 +28,7 @@ The project repository contains:
  * `firmware` - all the C code
  * `datasheets` - datasheets and manuals used during the development
 
-Dedicated project page (with prototype pictures) to follow soon.
+Dedicated project page (with pictures) to follow soon.
 
 All the project files are licensed under Modified BSD License (see LICENSE.txt).
 
